@@ -44,6 +44,11 @@ import { useToast } from '@/composables/useToast'
 export default {
   name: 'AppLayout',
   components: { AppSidebar, AppHeader, BaseModal, ConfigurationForm },
+  provide() {
+    return {
+      openNewConfigurationModal: this.handleNewConfiguration
+    }
+  },
   data() {
     return {
       sidebarOpen: false,

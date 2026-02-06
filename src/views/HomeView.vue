@@ -10,78 +10,202 @@
       <span>Carregando...</span>
     </div>
 
-    <div v-else class="home__stats">
-      <div class="stat-card">
-        <div class="stat-card__icon stat-card__icon--blue">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <template v-else>
+      <!-- Stat cards -->
+      <div class="home__stats">
+        <button class="stat-card stat-card--clickable" @click="scrollToConfigurations">
+          <div class="stat-card__icon stat-card__icon--blue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="stat-card__info">
+            <span class="stat-card__value">{{ totalConfigs }}</span>
+            <span class="stat-card__label">Configurações</span>
+          </div>
+          <svg class="stat-card__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
-        </div>
-        <div class="stat-card__info">
-          <span class="stat-card__value">{{ totalConfigs }}</span>
-          <span class="stat-card__label">Configurações</span>
-        </div>
+        </button>
+
+        <button class="stat-card stat-card--clickable" @click="$router.push({ name: 'Schedulings' })">
+          <div class="stat-card__icon stat-card__icon--green">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="stat-card__info">
+            <span class="stat-card__value">{{ totalSchedulings }}</span>
+            <span class="stat-card__label">Agendamentos Ativos</span>
+          </div>
+          <svg class="stat-card__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-card__icon stat-card__icon--green">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-            <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <!-- Empty state -->
+      <div v-if="totalConfigs === 0" class="home__empty">
+        <div class="home__empty-icon">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+            <path d="M12 8v4M12 16h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <div class="stat-card__info">
-          <span class="stat-card__value">{{ totalSchedulings }}</span>
-          <span class="stat-card__label">Agendamentos Ativos</span>
-        </div>
+        <h3>Nenhuma configuração encontrada</h3>
+        <p>Comece conectando uma plataforma para criar agendamentos de conteúdo.</p>
+        <button class="home__empty-btn" @click="openNewConfig(1)">
+          + Nova Configuração WordPress
+        </button>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-card__icon stat-card__icon--purple">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.5 17.82c-3.584-.698-6.32-3.874-6.32-7.66 0-.63.082-1.24.222-1.828L8.9 14.83v.99c0 1.1.9 2 2 2v1zm6.52-2.73c-.26-.8-1.01-1.39-1.9-1.39h-.6v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V6.7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-          </svg>
+      <!-- Configurations list -->
+      <div v-else ref="configurationsSection">
+        <div class="home__section-header">
+          <h2 class="home__section-title">Suas Configurações</h2>
+          <button class="home__new-config-btn" @click="openNewConfig(1)">
+            + Nova Configuração
+          </button>
         </div>
-        <div class="stat-card__info">
-          <span class="stat-card__value">{{ wordpressConfigs }}</span>
-          <span class="stat-card__label">Sites WordPress</span>
-        </div>
-      </div>
-    </div>
 
-    <div v-if="!loading && totalConfigs === 0" class="home__empty">
-      <div class="home__empty-icon">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-          <path d="M12 8v4M12 16h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
+        <div class="home__configs">
+          <div
+            v-for="config in configurations"
+            :key="config.Id"
+            class="config-item"
+          >
+            <button
+              class="config-item__header"
+              @click="toggleConfig(config.Id)"
+            >
+              <div class="config-item__platform">
+                <PlatformIcon :platform-id="config.PlatformId" />
+                <span class="config-item__platform-label">{{ platformLabel(config.PlatformId) }}</span>
+              </div>
+              <div class="config-item__details">
+                <span class="config-item__url">{{ formatUrl(config.Url) }}</span>
+                <span class="config-item__user">{{ config.Username }}</span>
+              </div>
+              <span class="config-item__badge">
+                {{ (config.Schedulings || []).length }} agendamento{{ (config.Schedulings || []).length !== 1 ? 's' : '' }}
+              </span>
+              <svg
+                class="config-item__expand"
+                :class="{ 'config-item__expand--open': isExpanded(config.Id) }"
+                width="16" height="16" viewBox="0 0 16 16" fill="none"
+              >
+                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+
+            <transition name="expand">
+              <div v-if="isExpanded(config.Id)" class="config-item__body" ref="schedulingsSection">
+                <div v-if="(config.Schedulings || []).length === 0" class="config-item__empty">
+                  Nenhum agendamento nesta configuração.
+                </div>
+
+                <router-link
+                  v-for="scheduling in (config.Schedulings || [])"
+                  :key="scheduling.Id"
+                  :to="`/configurations/${config.Id}/schedulings/${scheduling.Id}`"
+                  class="scheduling-row"
+                >
+                  <div class="scheduling-row__info">
+                    <span class="scheduling-row__title">
+                      {{ scheduling.Parameters?.ThemeTitle || `Agendamento #${scheduling.Id}` }}
+                    </span>
+                    <span v-if="scheduling.Parameters?.Description" class="scheduling-row__desc">
+                      {{ scheduling.Parameters.Description }}
+                    </span>
+                  </div>
+                  <div class="scheduling-row__meta">
+                    <span v-if="scheduling.Interval" class="scheduling-row__interval">
+                      {{ scheduling.Interval }}
+                    </span>
+                    <svg class="scheduling-row__arrow" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                </router-link>
+
+                <router-link
+                  :to="`/configurations/${config.Id}/schedulings/new`"
+                  class="config-item__add-scheduling"
+                >
+                  + Novo Agendamento
+                </router-link>
+              </div>
+            </transition>
+          </div>
+        </div>
       </div>
-      <h3>Nenhuma configuração encontrada</h3>
-      <p>Comece criando uma nova configuração na barra lateral.</p>
-    </div>
+    </template>
   </div>
 </template>
 
 <script>
 import { useConfigurations } from '@/composables/useConfigurations'
+import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
 
 export default {
   name: 'HomeView',
+  components: { PlatformIcon },
+  inject: {
+    openNewConfigurationModal: { default: () => () => {} }
+  },
+  data() {
+    return {
+      expandedConfigs: []
+    }
+  },
   computed: {
     loading() {
       const { loading } = useConfigurations()
       return loading.value
     },
-    totalConfigs() {
+    configurations() {
       const { configurations } = useConfigurations()
-      return configurations.value.length
+      return configurations.value
+    },
+    totalConfigs() {
+      return this.configurations.length
     },
     totalSchedulings() {
-      const { configurations } = useConfigurations()
-      return configurations.value.reduce((sum, c) => sum + (c.Schedulings || []).length, 0)
+      return this.configurations.reduce((sum, c) => sum + (c.Schedulings || []).length, 0)
+    }
+  },
+  methods: {
+    platformLabel(platformId) {
+      const map = { 1: 'WordPress', 2: 'Instagram' }
+      return map[platformId] || 'Plataforma'
     },
-    wordpressConfigs() {
-      const { getByPlatform } = useConfigurations()
-      return getByPlatform(0).length
+    formatUrl(url) {
+      if (!url) return 'Sem URL'
+      return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    },
+    isExpanded(id) {
+      return this.expandedConfigs.includes(id)
+    },
+    toggleConfig(id) {
+      const idx = this.expandedConfigs.indexOf(id)
+      if (idx >= 0) {
+        this.expandedConfigs.splice(idx, 1)
+      } else {
+        this.expandedConfigs.push(id)
+      }
+    },
+    openNewConfig(platformId) {
+      this.openNewConfigurationModal(platformId)
+    },
+    scrollToConfigurations() {
+      if (this.totalConfigs === 0) return
+      this.$nextTick(() => {
+        const ref = this.$refs.configurationsSection
+        const el = Array.isArray(ref) ? ref[0] : ref
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      })
     }
   }
 }
@@ -112,6 +236,7 @@ export default {
   color: var(--color-gray-500);
 }
 
+/* Stat Cards */
 .home__stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -127,10 +252,17 @@ export default {
   display: flex;
   align-items: center;
   gap: var(--spacing-lg);
-  transition: box-shadow var(--transition-normal);
+  transition: all var(--transition-normal);
+  text-align: left;
+  width: 100%;
 }
 
-.stat-card:hover {
+.stat-card--clickable {
+  cursor: pointer;
+}
+
+.stat-card--clickable:hover {
+  border-color: var(--color-primary);
   box-shadow: var(--shadow-md);
 }
 
@@ -154,14 +286,10 @@ export default {
   color: var(--color-success);
 }
 
-.stat-card__icon--purple {
-  background: #ede9fe;
-  color: #7c3aed;
-}
-
 .stat-card__info {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .stat-card__value {
@@ -175,6 +303,18 @@ export default {
   color: var(--color-gray-500);
 }
 
+.stat-card__arrow {
+  color: var(--color-gray-400);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.stat-card--clickable:hover .stat-card__arrow {
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+/* Empty state */
 .home__empty {
   text-align: center;
   padding: var(--spacing-3xl);
@@ -193,5 +333,258 @@ export default {
 
 .home__empty p {
   font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+.home__empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: background var(--transition-fast);
+}
+
+.home__empty-btn:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Section header */
+.home__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+}
+
+.home__section-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-gray-800);
+}
+
+.home__new-config-btn {
+  padding: 8px 16px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: background var(--transition-fast);
+}
+
+.home__new-config-btn:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Configuration items */
+.home__configs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.config-item {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition-normal);
+}
+
+.config-item:hover {
+  border-color: var(--color-gray-300);
+}
+
+.config-item__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.config-item__header:hover {
+  background: var(--color-gray-50);
+}
+
+.config-item__platform {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.config-item__platform-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.config-item__details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.config-item__url {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-gray-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.config-item__user {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.config-item__badge {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  background: var(--color-primary-light);
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.config-item__expand {
+  color: var(--color-gray-400);
+  flex-shrink: 0;
+  transition: transform var(--transition-normal);
+}
+
+.config-item__expand--open {
+  transform: rotate(180deg);
+}
+
+/* Expanded body */
+.config-item__body {
+  border-top: 1px solid var(--border-color);
+  padding: var(--spacing-md) var(--spacing-xl) var(--spacing-lg);
+}
+
+.config-item__empty {
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+}
+
+/* Scheduling rows */
+.scheduling-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  transition: background var(--transition-fast);
+  cursor: pointer;
+}
+
+.scheduling-row:hover {
+  background: var(--color-gray-50);
+  text-decoration: none;
+}
+
+.scheduling-row__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.scheduling-row__title {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-gray-800);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scheduling-row__desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.scheduling-row__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.scheduling-row__interval {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  font-family: monospace;
+  background: var(--color-gray-100);
+  padding: 2px 8px;
+  border-radius: var(--border-radius-sm);
+}
+
+.scheduling-row__arrow {
+  color: var(--color-gray-400);
+}
+
+.scheduling-row:hover .scheduling-row__arrow {
+  color: var(--color-primary);
+}
+
+.config-item__add-scheduling {
+  display: block;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--border-radius);
+  transition: background var(--transition-fast);
+  margin-top: var(--spacing-xs);
+}
+
+.config-item__add-scheduling:hover {
+  background: var(--color-primary-light);
+  text-decoration: none;
+}
+
+/* Expand transitions */
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+
+.expand-enter-to,
+.expand-leave-from {
+  opacity: 1;
+  max-height: 600px;
 }
 </style>

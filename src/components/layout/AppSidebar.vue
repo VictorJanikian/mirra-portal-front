@@ -1,7 +1,7 @@
 <template>
   <aside class="sidebar" :class="{ 'sidebar--open': mobileOpen }">
     <div class="sidebar__header">
-      <img :src="logo" alt="Mirra AI" class="sidebar__logo" />
+      <router-link to="/" class="sidebar__brand">MIRRA AI</router-link>
     </div>
 
     <nav class="sidebar__nav">
@@ -12,20 +12,20 @@
         <div class="sidebar__platform">
           <button
             class="sidebar__platform-btn"
-            :class="{ active: expandedPlatform === 0 }"
-            @click="togglePlatform(0)"
+            :class="{ active: expandedPlatform === 1 }"
+            @click="togglePlatform(1)"
           >
             <svg class="sidebar__platform-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.5 17.82c-3.584-.698-6.32-3.874-6.32-7.66 0-.63.082-1.24.222-1.828L8.9 14.83v.99c0 1.1.9 2 2 2v1zm6.52-2.73c-.26-.8-1.01-1.39-1.9-1.39h-.6v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V6.7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
             </svg>
             WordPress
-            <svg class="sidebar__expand-icon" :class="{ rotated: expandedPlatform === 0 }" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <svg class="sidebar__expand-icon" :class="{ rotated: expandedPlatform === 1 }" width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M4 2L8 6L4 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </button>
 
           <transition name="expand">
-            <div v-if="expandedPlatform === 0" class="sidebar__configs">
+            <div v-if="expandedPlatform === 1" class="sidebar__configs">
               <div
                 v-for="config in wordpressConfigs"
                 :key="config.Id"
@@ -62,7 +62,7 @@
                 </transition>
               </div>
 
-              <button class="sidebar__add-config" @click="$emit('new-configuration', 0)">
+              <button class="sidebar__add-config" @click="$emit('new-configuration', 1)">
                 + Nova Configuração
               </button>
             </div>
@@ -73,7 +73,7 @@
         <div class="sidebar__platform">
           <button
             class="sidebar__platform-btn sidebar__platform-btn--disabled"
-            @click="togglePlatform(1)"
+            @click="togglePlatform(2)"
           >
             <svg class="sidebar__platform-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
@@ -98,7 +98,7 @@
           <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/>
           <path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M13.1 2.9l-1.4 1.4M4.3 11.7l-1.4 1.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
         </svg>
-        Configurações
+        Preferências
       </router-link>
       <button class="sidebar__footer-link sidebar__footer-link--danger" @click="handleLogout">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -111,7 +111,6 @@
 </template>
 
 <script>
-import logo from '@/assets/mirra-logo.png'
 import { useAuth } from '@/composables/useAuth'
 import { useConfigurations } from '@/composables/useConfigurations'
 
@@ -123,7 +122,6 @@ export default {
   },
   data() {
     return {
-      logo,
       expandedPlatform: null,
       expandedConfig: null
     }
@@ -131,7 +129,7 @@ export default {
   computed: {
     wordpressConfigs() {
       const { configurations } = useConfigurations()
-      return configurations.value.filter(c => c.PlatformId === 0)
+      return configurations.value.filter(c => c.PlatformId === 1)
     }
   },
   methods: {
@@ -153,7 +151,7 @@ export default {
   mounted() {
     const { fetchAll } = useConfigurations()
     fetchAll()
-    this.expandedPlatform = 0
+    this.expandedPlatform = 1
   }
 }
 </script>
@@ -178,8 +176,18 @@ export default {
   border-bottom: 1px solid var(--border-color);
 }
 
-.sidebar__logo {
-  height: 48px;
+.sidebar__brand {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-gray-900);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.sidebar__brand:hover {
+  color: var(--color-primary);
+  text-decoration: none;
 }
 
 .sidebar__nav {

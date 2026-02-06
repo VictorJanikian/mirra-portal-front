@@ -6,7 +6,7 @@
         <path d="M32 4v8M32 52v8M4 32h8M52 32h8M11.5 11.5l5.7 5.7M46.8 46.8l5.7 5.7M52.5 11.5l-5.7 5.7M17.2 46.8l-5.7 5.7" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
       </svg>
     </div>
-    <h2>Configurações</h2>
+    <h2>Preferências</h2>
     <p>Esta funcionalidade estará disponível em breve.</p>
   </div>
 </template>

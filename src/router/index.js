@@ -42,6 +42,11 @@ const routes = [
         props: true
       },
       {
+        path: 'schedulings',
+        name: 'Schedulings',
+        component: () => import('@/views/SchedulingsView.vue')
+      },
+      {
         path: 'profile',
         name: 'Profile',
         component: () => import('@/views/ProfileView.vue')

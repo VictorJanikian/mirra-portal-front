@@ -65,8 +65,8 @@ export default {
       errors: {},
       loading: false,
       platformOptions: [
-        { value: '0', label: 'WordPress' },
-        { value: '1', label: 'Instagram' }
+        { value: '1', label: 'WordPress' },
+        { value: '2', label: 'Instagram' }
       ]
     }
   },

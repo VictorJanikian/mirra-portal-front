@@ -28,7 +28,7 @@ export default {
   emits: ['select'],
   computed: {
     platformLabel() {
-      const map = { 0: 'WordPress', 1: 'Instagram' }
+      const map = { 1: 'WordPress', 2: 'Instagram' }
       return map[this.configuration.PlatformId] || 'Plataforma'
     },
     schedulingCount() {
