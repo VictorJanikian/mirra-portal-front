@@ -1,6 +1,7 @@
 <template>
   <AuthCard>
-    <h2 class="auth-title">Criar Conta</h2>
+    <h2 class="auth-title">Crie sua conta</h2>
+    <p class="auth-subtitle">Comece a usar a Mirra AI agora</p>
 
     <form @submit.prevent="handleRegister" class="auth-form">
       <BaseInput
@@ -88,10 +89,16 @@ export default {
 
 <style scoped>
 .auth-title {
-  font-size: var(--font-size-xl);
-  font-weight: 600;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
   color: var(--color-gray-900);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-xs);
+}
+
+.auth-subtitle {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-xl);
 }
 
 .auth-form {
@@ -119,5 +126,11 @@ export default {
 .auth-link a {
   color: var(--color-primary);
   font-weight: 500;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.auth-link a:hover {
+  color: var(--color-primary-hover);
 }
 </style>

@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import logo from '@/assets/mirra-wordpress-logo.png'
+import logo from '@/assets/mirra-logo.png'
 import { useAuth } from '@/composables/useAuth'
 import { useConfigurations } from '@/composables/useConfigurations'
 

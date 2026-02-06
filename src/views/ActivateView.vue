@@ -111,16 +111,16 @@ export default {
 
 <style scoped>
 .auth-title {
-  font-size: var(--font-size-xl);
-  font-weight: 600;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
   color: var(--color-gray-900);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
 .auth-subtitle {
   color: var(--color-gray-500);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-xl);
   line-height: 1.5;
 }
 
@@ -180,5 +180,11 @@ export default {
 .auth-link a {
   color: var(--color-primary);
   font-weight: 500;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.auth-link a:hover {
+  color: var(--color-primary-hover);
 }
 </style>
