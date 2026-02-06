@@ -3,11 +3,12 @@
   <router-view />
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import ToastContainer from '@/components/ui/ToastContainer.vue'
 
-export default {
+export default defineComponent({
   name: 'App',
   components: { ToastContainer }
-}
+})
 </script>

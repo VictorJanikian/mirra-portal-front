@@ -5,7 +5,7 @@
     <form @submit.prevent="handleSubmit" class="scheduling-form__fields">
       <BaseInput
         v-model="formData.ThemeTitle"
-        label="Título do Tema"
+        label="Título do Tema *"
         tooltip="O tema geral do blog. Define o assunto principal sobre o qual a IA irá gerar conteúdo."
         placeholder="Ex: Marketing Digital para Pequenas Empresas"
       />
@@ -103,22 +103,24 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseTextarea from '@/components/ui/BaseTextarea.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import CronBuilder from './CronBuilder.vue'
+import type { Scheduling, SchedulingParameters } from '@/types'
 
-export default {
+export default defineComponent({
   name: 'SchedulingForm',
   components: { BaseInput, BaseTextarea, BaseButton, CronBuilder },
   props: {
-    scheduling: { type: Object, default: null },
+    scheduling: { type: Object as PropType<Scheduling | null>, default: null },
     loading: { type: Boolean, default: false }
   },
   emits: ['submit'],
   data() {
-    const params = this.scheduling?.Parameters || {}
+    const params: Partial<SchedulingParameters> = this.scheduling?.Parameters || {}
     return {
       formData: {
         ThemeTitle: params.ThemeTitle || '',
@@ -133,17 +135,17 @@ export default {
         AdditionalInfo: params.AdditionalInfo || '',
         SEOAdditionalInformation: params.SEOAdditionalInformation || '',
         Language: params.Language || 'pt-BR'
-      },
+      } as SchedulingParameters,
       cronExpression: this.scheduling?.Interval || '* * * * *'
     }
   },
   computed: {
-    isEditing() {
+    isEditing(): boolean {
       return !!this.scheduling?.Id
     }
   },
   methods: {
-    handleSubmit() {
+    handleSubmit(): void {
       this.$emit('submit', {
         ...this.formData,
         cronExpression: this.cronExpression
@@ -152,9 +154,9 @@ export default {
   },
   watch: {
     scheduling: {
-      handler(val) {
+      handler(val: Scheduling | null) {
         if (val) {
-          const params = val.Parameters || {}
+          const params: Partial<SchedulingParameters> = val.Parameters || {}
           this.formData = {
             ThemeTitle: params.ThemeTitle || '',
             Description: params.Description || '',
@@ -168,14 +170,30 @@ export default {
             AdditionalInfo: params.AdditionalInfo || '',
             SEOAdditionalInformation: params.SEOAdditionalInformation || '',
             Language: params.Language || 'pt-BR'
-          }
+          } as SchedulingParameters
           this.cronExpression = val.Interval || '* * * * *'
+        } else {
+          this.formData = {
+            ThemeTitle: '',
+            Description: '',
+            SearchIntent: '',
+            Keywords: '',
+            TargetAudience: '',
+            Style: '',
+            Goal: '',
+            CTA: '',
+            ApproximatedSize: '',
+            AdditionalInfo: '',
+            SEOAdditionalInformation: '',
+            Language: 'pt-BR'
+          } as SchedulingParameters
+          this.cronExpression = '* * * * *'
         }
       },
       deep: true
     }
   }
-}
+})
 </script>
 
 <style scoped>

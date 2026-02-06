@@ -53,12 +53,16 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
+import type { SelectOption } from '@/types'
+
+export default defineComponent({
   name: 'BaseMultiSelect',
   props: {
-    modelValue: { type: Array, default: () => ['*'] },
-    options: { type: Array, required: true },
+    modelValue: { type: Array as PropType<string[]>, default: () => ['*'] },
+    options: { type: Array as PropType<SelectOption[]>, required: true },
     wildcardLabel: { type: String, default: 'Todos' },
     showUnselected: { type: Boolean, default: false }
   },
@@ -67,18 +71,18 @@ export default {
     return { open: false }
   },
   computed: {
-    isWildcard() {
+    isWildcard(): boolean {
       return this.modelValue.includes('*')
     },
-    isUnselected() {
+    isUnselected(): boolean {
       return this.modelValue.includes('?')
     },
-    displayValue() {
+    displayValue(): string {
       if (this.isWildcard) return this.wildcardLabel
       if (this.isUnselected) return 'Não Selecionado'
       if (this.modelValue.length === 0) return this.wildcardLabel
-      const labels = this.modelValue.map(v => {
-        const opt = this.options.find(o => String(o.value) === String(v))
+      const labels = this.modelValue.map((v: string) => {
+        const opt = this.options.find((o: SelectOption) => String(o.value) === String(v))
         return opt ? opt.label : v
       })
       if (labels.length <= 3) return labels.join(', ')
@@ -86,29 +90,29 @@ export default {
     }
   },
   methods: {
-    toggle() {
+    toggle(): void {
       this.open = !this.open
     },
-    close() {
+    close(): void {
       this.open = false
     },
-    selectWildcard() {
+    selectWildcard(): void {
       this.$emit('update:modelValue', ['*'])
     },
-    selectUnselected() {
+    selectUnselected(): void {
       this.$emit('update:modelValue', ['?'])
     },
-    isSelected(value) {
+    isSelected(value: string): boolean {
       return this.modelValue.includes(String(value))
     },
-    toggleOption(value) {
+    toggleOption(value: string): void {
       const strValue = String(value)
-      let newValues
+      let newValues: string[]
 
       if (this.isWildcard || this.isUnselected) {
         newValues = [strValue]
       } else if (this.isSelected(strValue)) {
-        newValues = this.modelValue.filter(v => v !== strValue)
+        newValues = this.modelValue.filter((v: string) => v !== strValue)
         if (newValues.length === 0) newValues = ['*']
       } else {
         newValues = [...this.modelValue, strValue]
@@ -116,8 +120,9 @@ export default {
 
       this.$emit('update:modelValue', newValues)
     },
-    handleClickOutside(e) {
-      if (this.$refs.container && !this.$refs.container.contains(e.target)) {
+    handleClickOutside(e: MouseEvent): void {
+      const container = this.$refs.container as HTMLElement
+      if (container && !container.contains(e.target as Node)) {
         this.close()
       }
     }
@@ -128,7 +133,7 @@ export default {
   beforeUnmount() {
     document.removeEventListener('click', this.handleClickOutside)
   }
-}
+})
 </script>
 
 <style scoped>

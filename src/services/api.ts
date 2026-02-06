@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { type InternalAxiosRequestConfig } from 'axios'
 import router from '@/router'
 
 const api = axios.create({
@@ -6,7 +6,7 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' }
 })
 
-api.interceptors.request.use(config => {
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('mirra_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`

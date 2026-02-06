@@ -19,8 +19,10 @@
   </teleport>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'BaseModal',
   props: {
     show: { type: Boolean, default: false },
@@ -28,7 +30,7 @@ export default {
     maxWidth: { type: String, default: '540px' }
   },
   emits: ['close']
-}
+})
 </script>
 
 <style scoped>

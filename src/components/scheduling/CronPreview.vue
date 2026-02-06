@@ -4,20 +4,21 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { cronToHuman } from '@/utils/cronParser'
 
-export default {
+export default defineComponent({
   name: 'CronPreview',
   props: {
     expression: { type: String, default: '* * * * *' }
   },
   computed: {
-    humanReadable() {
+    humanReadable(): string {
       return cronToHuman(this.expression)
     }
   }
-}
+})
 </script>
 
 <style scoped>

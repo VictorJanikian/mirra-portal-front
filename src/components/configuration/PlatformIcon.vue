@@ -11,19 +11,21 @@
   </span>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PlatformIcon',
   props: {
     platformId: { type: Number, required: true }
   },
   computed: {
-    platformName() {
-      const map = { 1: 'wordpress', 2: 'instagram' }
+    platformName(): string {
+      const map: Record<number, string> = { 1: 'wordpress', 2: 'instagram' }
       return map[this.platformId] || 'unknown'
     }
   }
-}
+})
 </script>
 
 <style scoped>

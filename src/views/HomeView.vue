@@ -2,7 +2,7 @@
   <div class="home">
     <div class="home__header">
       <h1 class="home__title">Dashboard</h1>
-      <p class="home__subtitle">Bem-vindo ao Mirra AI. Gerencie seus agendamentos de conteúdo automatizado.</p>
+      <p class="home__subtitle">Bem-vindo à Mirra AI. Gerencie seus agendamentos de conteúdo automatizado.</p>
     </div>
 
     <div v-if="loading" class="home__loading">
@@ -25,7 +25,7 @@
           </div>
           <div class="stat-card__info">
             <span class="stat-card__value">{{ totalConfigs }}</span>
-            <span class="stat-card__label">Configurações</span>
+            <span class="stat-card__label">Conexões</span>
           </div>
         </button>
 
@@ -54,20 +54,20 @@
             <path d="M12 8v4M12 16h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <h3>Nenhuma configuração encontrada</h3>
+        <h3>Nenhuma conexão encontrada</h3>
         <p>Comece conectando uma plataforma para criar agendamentos de conteúdo.</p>
         <button class="home__empty-btn" @click="openNewConfig(1)">
-          + Nova Configuração WordPress
+          Conectar site ou perfil
         </button>
       </div>
 
-      <!-- Tab: Configurações -->
+      <!-- Tab: Conexões -->
       <transition name="fade" mode="out-in">
         <div v-if="activeTab === 'configurations' && totalConfigs > 0" key="configurations">
           <div class="home__section-header">
-            <h2 class="home__section-title">Suas Configurações</h2>
+            <h2 class="home__section-title">Suas Conexões</h2>
             <button class="home__new-config-btn" @click="openNewConfig(1)">
-              + Nova Configuração
+              + Nova Conexão
             </button>
           </div>
 
@@ -104,7 +104,7 @@
               <transition name="expand">
                 <div v-if="isExpanded(config.Id)" class="config-item__body">
                   <div v-if="(config.Schedulings || []).length === 0" class="config-item__empty">
-                    Nenhum agendamento nesta configuração.
+                    Nenhum agendamento nesta conexão.
                   </div>
 
                   <router-link
@@ -155,7 +155,7 @@
               <path d="M16 2v4M8 2v4M3 10h18" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
             <p>Nenhum agendamento encontrado.</p>
-            <span>Crie um agendamento dentro de uma configuração.</span>
+            <span>Crie um agendamento dentro de uma conexão.</span>
           </div>
 
           <div v-else class="home__schedulings-list">
@@ -196,39 +196,48 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
+import type { Configuration, Scheduling } from '@/types'
 
-export default {
+interface SchedulingItem {
+  configId: number
+  configUrl: string
+  platformId: number
+  scheduling: Scheduling
+}
+
+export default defineComponent({
   name: 'HomeView',
   components: { PlatformIcon },
   inject: {
-    openNewConfigurationModal: { default: () => () => {} }
+    openNewConfigurationModal: { default: () => function noop() { /* noop */ } }
   },
   data() {
     return {
-      activeTab: 'configurations',
-      expandedConfigs: []
+      activeTab: 'configurations' as string,
+      expandedConfigs: [] as number[]
     }
   },
   computed: {
-    loading() {
+    loading(): boolean {
       const { loading } = useConfigurations()
       return loading.value
     },
-    configurations() {
+    configurations(): Configuration[] {
       const { configurations } = useConfigurations()
       return configurations.value
     },
-    totalConfigs() {
+    totalConfigs(): number {
       return this.configurations.length
     },
-    totalSchedulings() {
-      return this.configurations.reduce((sum, c) => sum + (c.Schedulings || []).length, 0)
+    totalSchedulings(): number {
+      return this.configurations.reduce((sum: number, c: Configuration) => sum + (c.Schedulings || []).length, 0)
     },
-    allSchedulings() {
-      const result = []
+    allSchedulings(): SchedulingItem[] {
+      const result: SchedulingItem[] = []
       for (const config of this.configurations) {
         for (const scheduling of (config.Schedulings || [])) {
           result.push({
@@ -243,18 +252,18 @@ export default {
     }
   },
   methods: {
-    platformLabel(platformId) {
-      const map = { 1: 'WordPress', 2: 'Instagram' }
+    platformLabel(platformId: number): string {
+      const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
       return map[platformId] || 'Plataforma'
     },
-    formatUrl(url) {
+    formatUrl(url: string): string {
       if (!url) return 'Sem URL'
       return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
     },
-    isExpanded(id) {
+    isExpanded(id: number): boolean {
       return this.expandedConfigs.includes(id)
     },
-    toggleConfig(id) {
+    toggleConfig(id: number): void {
       const idx = this.expandedConfigs.indexOf(id)
       if (idx >= 0) {
         this.expandedConfigs.splice(idx, 1)
@@ -262,11 +271,11 @@ export default {
         this.expandedConfigs.push(id)
       }
     },
-    openNewConfig(platformId) {
-      this.openNewConfigurationModal(platformId)
+    openNewConfig(platformId: number): void {
+      (this.openNewConfigurationModal as (id: number) => void)(platformId)
     }
   }
-}
+})
 </script>
 
 <style scoped>

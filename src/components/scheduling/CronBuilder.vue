@@ -74,12 +74,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import CronFieldSelect from './CronFieldSelect.vue'
 import CronPreview from './CronPreview.vue'
 import { parseCronField, buildCronField } from '@/utils/cronParser'
+import type { CronFields, SelectOption } from '@/types'
 
-export default {
+export default defineComponent({
   name: 'CronBuilder',
   components: { CronFieldSelect, CronPreview },
   props: {
@@ -90,11 +92,11 @@ export default {
     return {
       advancedMode: false,
       rawExpression: this.modelValue || '* * * * *',
-      fields: this.parseExpression(this.modelValue || '* * * * *')
+      fields: this.parseExpression(this.modelValue || '* * * * *') as CronFields
     }
   },
   computed: {
-    computedExpression() {
+    computedExpression(): string {
       if (this.advancedMode) return this.rawExpression
       const min = buildCronField(this.fields.minutes)
       const hour = buildCronField(this.fields.hours)
@@ -103,7 +105,7 @@ export default {
       const dow = buildCronField(this.fields.weekdays)
       return `${min} ${hour} ${dom} ${month} ${dow}`
     },
-    minuteOptions() {
+    minuteOptions(): SelectOption[] {
       return [
         { value: '0', label: '00' },
         { value: '15', label: '15' },
@@ -111,26 +113,26 @@ export default {
         { value: '45', label: '45' }
       ]
     },
-    hourOptions() {
-      const opts = []
+    hourOptions(): SelectOption[] {
+      const opts: SelectOption[] = []
       for (let h = 0; h < 24; h++) {
         opts.push({ value: String(h), label: `${String(h).padStart(2, '0')}h` })
       }
       return opts
     },
-    dayOptions() {
-      const opts = []
+    dayOptions(): SelectOption[] {
+      const opts: SelectOption[] = []
       for (let d = 1; d <= 31; d++) {
         opts.push({ value: String(d), label: String(d) })
       }
       return opts
     },
-    monthOptions() {
-      const names = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    monthOptions(): SelectOption[] {
+      const names: string[] = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
         'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
       return names.map((name, i) => ({ value: String(i + 1), label: name }))
     },
-    weekdayOptions() {
+    weekdayOptions(): SelectOption[] {
       return [
         { value: '0', label: 'Domingo' },
         { value: '1', label: 'Segunda' },
@@ -143,10 +145,10 @@ export default {
     }
   },
   watch: {
-    computedExpression(val) {
+    computedExpression(val: string) {
       this.$emit('update:modelValue', val)
     },
-    modelValue(val) {
+    modelValue(val: string) {
       if (val !== this.computedExpression) {
         this.rawExpression = val
         this.fields = this.parseExpression(val)
@@ -154,7 +156,7 @@ export default {
     }
   },
   methods: {
-    parseExpression(expr) {
+    parseExpression(expr: string): CronFields {
       if (!expr) return { minutes: ['*'], hours: ['*'], daysOfMonth: ['*'], months: ['*'], weekdays: ['*'] }
       const parts = expr.trim().split(/\s+/)
       return {
@@ -165,14 +167,14 @@ export default {
         weekdays: parseCronField(parts[4] || '*')
       }
     },
-    updateField(field, value) {
+    updateField(field: keyof CronFields, value: string[]) {
       this.fields[field] = value
     },
     onRawInput() {
       // Raw expression is already v-modeled
     }
   }
-}
+})
 </script>
 
 <style scoped>

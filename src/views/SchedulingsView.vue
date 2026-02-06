@@ -8,7 +8,7 @@
         Dashboard
       </router-link>
       <h1 class="schedulings-view__title">Agendamentos Ativos</h1>
-      <p class="schedulings-view__subtitle">Todos os agendamentos de todas as suas configurações.</p>
+      <p class="schedulings-view__subtitle">Todos os agendamentos de todas as suas conexões.</p>
     </div>
 
     <div v-if="loading" class="schedulings-view__loading">
@@ -24,7 +24,7 @@
         </svg>
       </div>
       <h3>Nenhum agendamento encontrado</h3>
-      <p>Crie um agendamento dentro de uma configuração existente.</p>
+      <p>Crie um agendamento dentro de uma conexão existente.</p>
     </div>
 
     <div v-else class="schedulings-view__list">
@@ -64,24 +64,33 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
+import type { Configuration, Scheduling } from '@/types'
 
-export default {
+interface SchedulingItem {
+  configId: number
+  configUrl: string
+  platformId: number
+  scheduling: Scheduling
+}
+
+export default defineComponent({
   name: 'SchedulingsView',
   components: { PlatformIcon },
   computed: {
-    loading() {
+    loading(): boolean {
       const { loading } = useConfigurations()
       return loading.value
     },
-    configurations() {
+    configurations(): Configuration[] {
       const { configurations } = useConfigurations()
       return configurations.value
     },
-    allSchedulings() {
-      const result = []
+    allSchedulings(): SchedulingItem[] {
+      const result: SchedulingItem[] = []
       for (const config of this.configurations) {
         for (const scheduling of (config.Schedulings || [])) {
           result.push({
@@ -96,16 +105,16 @@ export default {
     }
   },
   methods: {
-    platformLabel(platformId) {
-      const map = { 1: 'WordPress', 2: 'Instagram' }
+    platformLabel(platformId: number): string {
+      const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
       return map[platformId] || 'Plataforma'
     },
-    formatUrl(url) {
+    formatUrl(url: string): string {
       if (!url) return 'Sem URL'
       return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
     }
   }
-}
+})
 </script>
 
 <style scoped>

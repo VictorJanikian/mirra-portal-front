@@ -40,14 +40,23 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import { useToast } from '@/composables/useToast'
+import type { SelectOption } from '@/types'
 
-export default {
+interface ConfigFormData {
+  PlatformId: string
+  Url: string
+  Username: string
+  Password: string
+}
+
+export default defineComponent({
   name: 'ConfigurationForm',
   components: { BaseInput, BaseSelect, BaseButton },
   props: {
@@ -61,43 +70,43 @@ export default {
         Url: '',
         Username: '',
         Password: ''
-      },
-      errors: {},
+      } as ConfigFormData,
+      errors: {} as Record<string, string>,
       loading: false,
       platformOptions: [
         { value: '1', label: 'WordPress' },
         { value: '2', label: 'Instagram' }
-      ]
+      ] as SelectOption[]
     }
   },
   methods: {
-    validate() {
+    validate(): boolean {
       this.errors = {}
       if (!this.form.Url) this.errors.Url = 'Informe a URL'
       if (!this.form.Username) this.errors.Username = 'Informe o usuário'
       if (!this.form.Password) this.errors.Password = 'Informe a senha'
       return Object.keys(this.errors).length === 0
     },
-    async handleSubmit() {
+    async handleSubmit(): Promise<void> {
       if (!this.validate()) return
       this.loading = true
       try {
         const { create } = useConfigurations()
         await create({
           ...this.form,
-          PlatformId: Number(this.form.PlatformId),
-          Schedulings: []
+          PlatformId: Number(this.form.PlatformId)
         })
         this.$emit('saved')
-      } catch (e) {
+      } catch (e: unknown) {
+        const err = e as { response?: { data?: { message?: string } } }
         const { error } = useToast()
-        error(e.response?.data?.message || 'Erro ao criar configuração')
+        error(err.response?.data?.message || 'Erro ao criar conexão')
       } finally {
         this.loading = false
       }
     }
   }
-}
+})
 </script>
 
 <style scoped>

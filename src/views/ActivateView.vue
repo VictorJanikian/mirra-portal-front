@@ -38,12 +38,13 @@
   </AuthCard>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import AuthCard from '@/components/auth/AuthCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import { useAuth } from '@/composables/useAuth'
 
-export default {
+export default defineComponent({
   name: 'ActivateView',
   components: { AuthCard, BaseButton },
   data() {
@@ -54,33 +55,36 @@ export default {
     }
   },
   computed: {
-    email() {
-      return this.$route.query.email || ''
+    email(): string {
+      return (this.$route.query.email as string) || ''
     }
   },
   methods: {
-    onCodeInput(event, index) {
-      const val = event.target.value.replace(/\D/g, '')
-      event.target.value = val
+    onCodeInput(event: Event, index: number): void {
+      const target = event.target as HTMLInputElement
+      const val = target.value.replace(/\D/g, '')
+      target.value = val
 
       const arr = this.code.split('')
       arr[index] = val
       this.code = arr.join('')
 
       if (val && index < 5) {
-        this.$refs.codeInputs[index + 1].focus()
+        const inputs = this.$refs.codeInputs as HTMLInputElement[]
+        inputs[index + 1].focus()
       }
     },
-    onCodeKeydown(event, index) {
+    onCodeKeydown(event: KeyboardEvent, index: number): void {
       if (event.key === 'Backspace' && !this.code[index] && index > 0) {
-        this.$refs.codeInputs[index - 1].focus()
+        const inputs = this.$refs.codeInputs as HTMLInputElement[]
+        inputs[index - 1].focus()
       }
     },
-    onCodePaste(event) {
+    onCodePaste(event: ClipboardEvent): void {
       event.preventDefault()
-      const pasted = (event.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6)
+      const pasted = (event.clipboardData?.getData('text') || '').replace(/\D/g, '').slice(0, 6)
       this.code = pasted
-      const inputs = this.$refs.codeInputs
+      const inputs = this.$refs.codeInputs as HTMLInputElement[]
       for (let i = 0; i < 6; i++) {
         inputs[i].value = pasted[i] || ''
       }
@@ -89,7 +93,7 @@ export default {
         inputs[focusIdx].focus()
       }
     },
-    async handleActivate() {
+    async handleActivate(): Promise<void> {
       if (this.code.length !== 6) {
         this.serverError = 'Digite o código completo de 6 dígitos'
         return
@@ -99,14 +103,15 @@ export default {
       try {
         const { activate } = useAuth()
         await activate(this.email, this.code)
-      } catch (e) {
-        this.serverError = e.response?.data?.message || e.response?.data || 'Código inválido. Tente novamente.'
+      } catch (e: unknown) {
+        const err = e as { response?: { data?: { message?: string } | string } }
+        this.serverError = (err.response?.data as { message?: string })?.message || err.response?.data as string || 'Código inválido. Tente novamente.'
       } finally {
         this.loading = false
       }
     }
   }
-}
+})
 </script>
 
 <style scoped>

@@ -18,16 +18,17 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useToast } from '@/composables/useToast'
 
-export default {
+export default defineComponent({
   name: 'ToastContainer',
   setup() {
     const { toasts, dismiss } = useToast()
     return { toasts, dismiss }
   }
-}
+})
 </script>
 
 <style scoped>

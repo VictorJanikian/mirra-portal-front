@@ -10,8 +10,10 @@
   </button>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'BaseButton',
   props: {
     variant: { type: String, default: 'primary' },
@@ -22,5 +24,5 @@ export default {
     small: { type: Boolean, default: false }
   },
   emits: ['click']
-}
+})
 </script>

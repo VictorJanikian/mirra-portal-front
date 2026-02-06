@@ -1,26 +1,26 @@
-const WEEKDAY_MAP = {
+const WEEKDAY_MAP: Record<number, string> = {
   0: 'Domingo', 1: 'Segunda', 2: 'Terça', 3: 'Quarta',
   4: 'Quinta', 5: 'Sexta', 6: 'Sábado'
 }
 
-const MONTH_MAP = {
+const MONTH_MAP: Record<number, string> = {
   1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
   5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
   9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
 }
 
-function formatList(values, map) {
-  const items = values.split(',').map(v => map[v] || v)
+function formatList(values: string, map: Record<number, string>): string {
+  const items = values.split(',').map(v => map[Number(v)] || v)
   if (items.length === 1) return items[0]
   if (items.length === 2) return `${items[0]} e ${items[1]}`
   return `${items.slice(0, -1).join(', ')} e ${items[items.length - 1]}`
 }
 
-function isSundayOrSaturday(day) {
+function isSundayOrSaturday(day: string): boolean {
   return day === '0' || day === '6'
 }
 
-export function cronToHuman(expr) {
+export function cronToHuman(expr: string): string {
   if (!expr || !/^([*?0-9,/-]+ ){4}[*?0-9,/-]+$/.test(expr.trim())) {
     return 'Expressão cron inválida'
   }
@@ -33,7 +33,7 @@ export function cronToHuman(expr) {
   if (expr.trim() === '0 0 * * *') return 'Todos os dias à meia-noite'
   if (expr.trim() === '0 12 * * *') return 'Todos os dias ao meio-dia'
 
-  const parts = []
+  const parts: string[] = []
 
   // Minutes
   if (min === '*') {
@@ -84,7 +84,7 @@ export function cronToHuman(expr) {
         parts.push(`em ${months.length} meses específicos`)
       }
     } else {
-      parts.push(`em ${MONTH_MAP[month] || month}`)
+      parts.push(`em ${MONTH_MAP[Number(month)] || month}`)
     }
   }
 
@@ -100,7 +100,7 @@ export function cronToHuman(expr) {
       }
     } else {
       const prep = isSundayOrSaturday(weekday) ? 'aos' : 'nas'
-      parts.push(`${prep} ${WEEKDAY_MAP[weekday] || weekday}`)
+      parts.push(`${prep} ${WEEKDAY_MAP[Number(weekday)] || weekday}`)
     }
   }
 
@@ -108,13 +108,13 @@ export function cronToHuman(expr) {
   return result.charAt(0).toUpperCase() + result.slice(1)
 }
 
-export function parseCronField(field) {
+export function parseCronField(field: string): string[] {
   if (field === '*') return ['*']
   if (field === '?') return ['?']
   return field.split(',')
 }
 
-export function buildCronField(values) {
+export function buildCronField(values: string[] | null | undefined): string {
   if (!values || values.length === 0 || values.includes('*')) return '*'
   if (values.includes('?')) return '?'
   return values.join(',')

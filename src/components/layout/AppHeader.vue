@@ -46,21 +46,22 @@
   </header>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 
-export default {
+export default defineComponent({
   name: 'AppHeader',
   emits: ['toggle-sidebar'],
   data() {
     return { menuOpen: false }
   },
   computed: {
-    userName() {
+    userName(): string {
       const { state } = useAuth()
       return state.user?.Name || 'Usuário'
     },
-    initials() {
+    initials(): string {
       const name = this.userName
       const parts = name.split(' ')
       if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
@@ -68,13 +69,14 @@ export default {
     }
   },
   methods: {
-    handleLogout() {
+    handleLogout(): void {
       this.menuOpen = false
       const { logout } = useAuth()
       logout()
     },
-    handleClickOutside(e) {
-      if (this.$refs.userMenu && !this.$refs.userMenu.contains(e.target)) {
+    handleClickOutside(e: MouseEvent): void {
+      const userMenu = this.$refs.userMenu as HTMLElement | undefined
+      if (userMenu && !userMenu.contains(e.target as Node)) {
         this.menuOpen = false
       }
     }
@@ -85,7 +87,7 @@ export default {
   beforeUnmount() {
     document.removeEventListener('click', this.handleClickOutside)
   }
-}
+})
 </script>
 
 <style scoped>

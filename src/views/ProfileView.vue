@@ -15,22 +15,23 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 
-export default {
+export default defineComponent({
   name: 'ProfileView',
   computed: {
-    userName() {
+    userName(): string {
       const { state } = useAuth()
       return state.user?.Name || ''
     },
-    userEmail() {
+    userEmail(): string {
       const { state } = useAuth()
       return state.user?.Email || ''
     }
   }
-}
+})
 </script>
 
 <style scoped>

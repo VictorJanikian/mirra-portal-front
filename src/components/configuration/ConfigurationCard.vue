@@ -16,32 +16,34 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
 import PlatformIcon from './PlatformIcon.vue'
+import type { Configuration } from '@/types'
 
-export default {
+export default defineComponent({
   name: 'ConfigurationCard',
   components: { PlatformIcon },
   props: {
-    configuration: { type: Object, required: true }
+    configuration: { type: Object as PropType<Configuration>, required: true }
   },
   emits: ['select'],
   computed: {
-    platformLabel() {
-      const map = { 1: 'WordPress', 2: 'Instagram' }
+    platformLabel(): string {
+      const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
       return map[this.configuration.PlatformId] || 'Plataforma'
     },
-    schedulingCount() {
+    schedulingCount(): number {
       return (this.configuration.Schedulings || []).length
     }
   },
   methods: {
-    formatUrl(url) {
+    formatUrl(url: string): string {
       if (!url) return ''
       return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
     }
   }
-}
+})
 </script>
 
 <style scoped>

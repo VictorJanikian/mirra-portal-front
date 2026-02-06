@@ -16,6 +16,7 @@
 
       <SchedulingForm
         v-if="showForm"
+        :key="currentSchedulingId ?? 'new'"
         :scheduling="currentScheduling"
         :loading="saving"
         @submit="onSubmit"
@@ -41,7 +42,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
 import SchedulingList from '@/components/scheduling/SchedulingList.vue'
 import SchedulingForm from '@/components/scheduling/SchedulingForm.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
@@ -49,26 +51,37 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import { useSchedulings } from '@/composables/useSchedulings'
 import { useConfigurations } from '@/composables/useConfigurations'
 import { useToast } from '@/composables/useToast'
+import type { Scheduling, SchedulingPayload } from '@/types'
 
-export default {
+export default defineComponent({
   name: 'SchedulingFormView',
   components: { SchedulingList, SchedulingForm, BaseModal, BaseButton },
   props: {
-    configId: { type: [String, Number], required: true },
-    schedulingId: { type: [String, Number], default: null }
+    configId: { type: [String, Number] as PropType<string | number>, required: true },
+    schedulingId: { type: [String, Number] as PropType<string | number>, default: null }
   },
   data() {
     return {
-      schedulings: [],
-      currentScheduling: null,
-      currentSchedulingId: null,
+      schedulings: [] as Scheduling[],
+      currentScheduling: null as Scheduling | null,
+      currentSchedulingId: null as number | null,
       showForm: false,
       pageLoading: true,
       saving: false,
       deleting: false,
       showDeleteModal: false,
-      schedulingToDelete: null,
-      schedulingApi: null
+      schedulingToDelete: null as Scheduling | null,
+      schedulingApi: null as unknown
+    }
+  },
+  computed: {
+    api(): ReturnType<typeof useSchedulings> {
+      return this.schedulingApi as unknown as ReturnType<typeof useSchedulings>
+    }
+  },
+  watch: {
+    schedulingId(): void {
+      this.loadData()
     }
   },
   async created() {
@@ -76,20 +89,20 @@ export default {
     await this.loadData()
   },
   methods: {
-    async loadData() {
+    async loadData(): Promise<void> {
       this.pageLoading = true
       try {
-        await this.schedulingApi.fetchAll()
-        this.schedulings = this.schedulingApi.schedulings.value
+        await this.api.fetchAll()
+        this.schedulings = this.api.schedulings.value
 
         if (this.schedulingId && this.schedulingId !== 'new') {
-          const data = await this.schedulingApi.fetchOne(Number(this.schedulingId))
+          const data = await this.api.fetchOne(Number(this.schedulingId))
           if (data) {
             this.currentScheduling = data
             this.currentSchedulingId = data.Id
             this.showForm = true
           }
-        } else if (this.schedulingId === 'new') {
+        } else {
           this.currentScheduling = null
           this.currentSchedulingId = null
           this.showForm = true
@@ -99,68 +112,69 @@ export default {
       }
     },
 
-    onSelectScheduling(scheduling) {
+    onSelectScheduling(scheduling: Scheduling): void {
       this.currentScheduling = scheduling
       this.currentSchedulingId = scheduling.Id
       this.showForm = true
       this.$router.replace({
         name: 'SchedulingEdit',
-        params: { configId: this.configId, schedulingId: scheduling.Id }
+        params: { configId: String(this.configId), schedulingId: String(scheduling.Id) }
       })
     },
 
-    onCreateNew() {
+    onCreateNew(): void {
       this.currentScheduling = null
       this.currentSchedulingId = null
       this.showForm = true
       this.$router.replace({
         name: 'SchedulingCreate',
-        params: { configId: this.configId }
+        params: { configId: String(this.configId) }
       })
     },
 
-    async onSubmit(formData) {
+    async onSubmit(formData: Record<string, unknown>): Promise<void> {
       this.saving = true
       const { success, error } = useToast()
       try {
         const { cronExpression, ...parameters } = formData
-        const payload = {
-          Interval: cronExpression || '* * * * *',
-          Parameters: parameters
+        const payload: SchedulingPayload = {
+          Interval: (cronExpression as string) || '* * * * *',
+          Parameters: parameters as unknown as SchedulingPayload['Parameters']
         }
 
         if (this.currentSchedulingId) {
-          const updated = await this.schedulingApi.update(this.currentSchedulingId, payload)
+          const updated = await this.api.update(this.currentSchedulingId, payload)
           this.currentScheduling = updated
           success('Agendamento atualizado com sucesso!')
         } else {
-          const created = await this.schedulingApi.create(payload)
+          const created = await this.api.create(payload)
           this.currentScheduling = created
           this.currentSchedulingId = created.Id
           success('Agendamento criado com sucesso!')
         }
 
-        this.schedulings = this.schedulingApi.schedulings.value
+        this.schedulings = this.api.schedulings.value
         await this.refreshConfigurations()
-      } catch (e) {
-        error(e.response?.data?.message || 'Erro ao salvar agendamento')
+      } catch (e: unknown) {
+        const err = e as { response?: { data?: { message?: string } } }
+        error(err.response?.data?.message || 'Erro ao salvar agendamento')
       } finally {
         this.saving = false
       }
     },
 
-    onDeleteScheduling(scheduling) {
+    onDeleteScheduling(scheduling: Scheduling): void {
       this.schedulingToDelete = scheduling
       this.showDeleteModal = true
     },
 
-    async confirmDelete() {
+    async confirmDelete(): Promise<void> {
       if (!this.schedulingToDelete) return
       this.deleting = true
       const { success, error } = useToast()
       try {
-        await this.schedulingApi.remove(this.schedulingToDelete.Id)
-        this.schedulings = this.schedulingApi.schedulings.value
+        await this.api.remove(this.schedulingToDelete.Id)
+        this.schedulings = this.api.schedulings.value
         success('Agendamento removido com sucesso!')
 
         if (this.currentSchedulingId === this.schedulingToDelete.Id) {
@@ -172,24 +186,25 @@ export default {
         this.showDeleteModal = false
         this.schedulingToDelete = null
         await this.refreshConfigurations()
-      } catch (e) {
-        error(e.response?.data?.message || 'Erro ao remover agendamento')
+      } catch (e: unknown) {
+        const err = e as { response?: { data?: { message?: string } } }
+        error(err.response?.data?.message || 'Erro ao remover agendamento')
       } finally {
         this.deleting = false
       }
     },
 
-    getCronFromForm() {
+    getCronFromForm(): string {
       // Fallback: get cron from CronBuilder v-model
       return '* * * * *'
     },
 
-    async refreshConfigurations() {
+    async refreshConfigurations(): Promise<void> {
       const { fetchAll } = useConfigurations()
       await fetchAll()
     }
   }
-}
+})
 </script>
 
 <style scoped>

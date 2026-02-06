@@ -24,18 +24,21 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
+import type { SelectOption } from '@/types'
 import BaseTooltip from './BaseTooltip.vue'
 
 let uid = 0
 
-export default {
+export default defineComponent({
   name: 'BaseSelect',
   components: { BaseTooltip },
   props: {
     modelValue: { type: [String, Number], default: '' },
     label: { type: String, default: '' },
-    options: { type: Array, default: () => [] },
+    options: { type: Array as PropType<SelectOption[]>, default: () => [] },
     placeholder: { type: String, default: '' },
     tooltip: { type: String, default: '' },
     error: { type: String, default: '' },
@@ -46,5 +49,5 @@ export default {
     uid++
     return { fieldId: `field-select-${uid}` }
   }
-}
+})
 </script>

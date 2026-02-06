@@ -63,7 +63,7 @@
               </div>
 
               <button class="sidebar__add-config" @click="$emit('new-configuration', 1)">
-                + Nova Configuração
+                + Conectar site
               </button>
             </div>
           </transition>
@@ -110,11 +110,13 @@
   </aside>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useConfigurations } from '@/composables/useConfigurations'
+import type { Configuration } from '@/types'
 
-export default {
+export default defineComponent({
   name: 'AppSidebar',
   emits: ['new-configuration'],
   props: {
@@ -122,28 +124,28 @@ export default {
   },
   data() {
     return {
-      expandedPlatform: null,
-      expandedConfig: null
+      expandedPlatform: null as number | null,
+      expandedConfig: null as number | null
     }
   },
   computed: {
-    wordpressConfigs() {
+    wordpressConfigs(): Configuration[] {
       const { configurations } = useConfigurations()
-      return configurations.value.filter(c => c.PlatformId === 1)
+      return configurations.value.filter((c: Configuration) => c.PlatformId === 1)
     }
   },
   methods: {
-    togglePlatform(id) {
+    togglePlatform(id: number): void {
       this.expandedPlatform = this.expandedPlatform === id ? null : id
     },
-    toggleConfig(id) {
+    toggleConfig(id: number): void {
       this.expandedConfig = this.expandedConfig === id ? null : id
     },
-    formatUrl(url) {
+    formatUrl(url: string): string {
       if (!url) return 'Sem URL'
       return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
     },
-    handleLogout() {
+    handleLogout(): void {
       const { logout } = useAuth()
       logout()
     }
@@ -153,7 +155,7 @@ export default {
     fetchAll()
     this.expandedPlatform = 1
   }
-}
+})
 </script>
 
 <style scoped>

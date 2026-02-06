@@ -46,15 +46,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import logo from '@/assets/mirra-logo.png'
 
-export default {
+export default defineComponent({
   name: 'AuthCard',
   data() {
-    return { logo }
+    return { logo: logo as string }
   }
-}
+})
 </script>
 
 <style scoped>

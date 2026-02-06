@@ -40,15 +40,18 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
+import type { Scheduling } from '@/types'
+
+export default defineComponent({
   name: 'SchedulingList',
   props: {
-    schedulings: { type: Array, default: () => [] },
+    schedulings: { type: Array as PropType<Scheduling[]>, default: () => [] },
     activeId: { type: Number, default: null }
   },
   emits: ['select', 'create', 'delete']
-}
+})
 </script>
 
 <style scoped>

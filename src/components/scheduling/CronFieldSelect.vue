@@ -26,30 +26,32 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
 import BaseMultiSelect from '@/components/ui/BaseMultiSelect.vue'
+import type { SelectOption } from '@/types'
 
-export default {
+export default defineComponent({
   name: 'CronFieldSelect',
   components: { BaseMultiSelect },
   props: {
     label: { type: String, required: true },
-    modelValue: { type: Array, default: () => ['*'] },
-    options: { type: Array, required: true },
+    modelValue: { type: Array as PropType<string[]>, default: () => ['*'] },
+    options: { type: Array as PropType<SelectOption[]>, required: true },
     wildcardLabel: { type: String, default: 'Todos' },
     multiple: { type: Boolean, default: true },
     showUnselected: { type: Boolean, default: false }
   },
   emits: ['update:modelValue'],
   computed: {
-    singleValue() {
+    singleValue(): string {
       return this.modelValue[0] || '*'
     },
-    singleOptions() {
+    singleOptions(): SelectOption[] {
       return [{ value: '*', label: this.wildcardLabel }, ...this.options]
     }
   }
-}
+})
 </script>
 
 <style scoped>

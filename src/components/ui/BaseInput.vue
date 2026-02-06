@@ -19,12 +19,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import BaseTooltip from './BaseTooltip.vue'
 
 let uid = 0
 
-export default {
+export default defineComponent({
   name: 'BaseInput',
   components: { BaseTooltip },
   props: {
@@ -42,5 +43,5 @@ export default {
     uid++
     return { fieldId: `field-input-${uid}` }
   }
-}
+})
 </script>

@@ -18,10 +18,10 @@
       </main>
     </div>
 
-    <!-- Modal: Nova Configuração -->
+    <!-- Modal: Nova Conexão -->
     <BaseModal
       :show="showConfigModal"
-      title="Nova Configuração"
+      title="Nova Conexão"
       @close="showConfigModal = false"
     >
       <ConfigurationForm
@@ -33,7 +33,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import AppSidebar from './AppSidebar.vue'
 import AppHeader from './AppHeader.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
@@ -41,7 +42,7 @@ import ConfigurationForm from '@/components/configuration/ConfigurationForm.vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import { useToast } from '@/composables/useToast'
 
-export default {
+export default defineComponent({
   name: 'AppLayout',
   components: { AppSidebar, AppHeader, BaseModal, ConfigurationForm },
   provide() {
@@ -57,19 +58,19 @@ export default {
     }
   },
   methods: {
-    handleNewConfiguration(platformId) {
+    handleNewConfiguration(platformId: number): void {
       this.newConfigPlatformId = platformId
       this.showConfigModal = true
     },
-    async onConfigSaved() {
+    async onConfigSaved(): Promise<void> {
       this.showConfigModal = false
       const { fetchAll } = useConfigurations()
       await fetchAll()
       const { success } = useToast()
-      success('Configuração criada com sucesso!')
+      success('Conexão criada com sucesso!')
     }
   }
-}
+})
 </script>
 
 <style scoped>
