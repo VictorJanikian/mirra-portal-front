@@ -14,7 +14,7 @@ Os IDs de plataforma usados pela API são:
 
 Isso foi corrigido nesta sessão. O código original usava 0 e 1, mas a API retorna 1 e 2.
 
-## O que foi feito nesta sessão
+## O que foi feito na sessão anterior (sessão 1)
 
 ### 1. Dashboard (HomeView.vue) - Redesenhado
 - Removido o card "Sites WordPress" (era redundante)
@@ -83,8 +83,33 @@ Isso foi corrigido nesta sessão. O código original usava 0 e 1, mas a API reto
 - **Logout**: funcional (limpa localStorage, redireciona para login)
 - **Auth completo**: Login, Register, Activate - tudo funcional
 
+## O que foi feito na sessão atual (sessão 2)
+
+### 1. Dashboard - Cards como Tabs/Filtros (HomeView.vue)
+- Cards "Configurações" e "Agendamentos" agora funcionam como **tabs** que alternam a visualização abaixo
+- **Antes**: "Configurações" fazia scroll, "Agendamentos" navegava para `/schedulings`
+- **Agora**: ambos mudam o `activeTab` (data) e a seção abaixo exibe o conteúdo correspondente
+- Estado `activeTab: 'configurations'` (default) ou `'schedulings'`
+- Card ativo recebe destaque visual (`stat-card--active`: borda azul + label colorido)
+- Setas de navegação removidas dos cards (não fazem mais sentido como tabs)
+- **Tab Configurações**: mesma lista expansível de antes
+- **Tab Agendamentos**: lista flat de todos os agendamentos (inline, sem sair do dashboard)
+  - Cada card mostra: título, descrição, tags (plataforma, URL, cron), seta de navegação
+  - Estado vazio tratado ("Nenhum agendamento encontrado")
+- Transição **fade** suave entre tabs (`<transition name="fade" mode="out-in">`)
+- Computed `allSchedulings` adicionado (mesma lógica do `SchedulingsView.vue`)
+- Método `scrollToConfigurations()` removido (não mais necessário)
+
+### Arquivos modificados nesta sessão
+- `src/views/HomeView.vue` - Tabs no dashboard + seção agendamentos inline
+- `progress.md` - Atualizado
+
+### Notas
+- A rota `/schedulings` e `SchedulingsView.vue` continuam existindo e funcionais (acesso direto)
+- Nenhuma nova dependência adicionada
+
 ## Estado do build
 
 - Lint: OK (sem erros)
-- Build: OK (compilado com sucesso)
+- Build: pendente de teste manual
 - Nenhum commit foi feito nesta sessão

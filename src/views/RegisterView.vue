@@ -78,7 +78,7 @@ export default {
         const { register } = useAuth()
         await register(this.name, this.email, this.password)
       } catch (e) {
-        this.serverError = e.response?.data?.message || e.response?.data || 'Erro ao criar conta. Tente novamente.'
+        this.serverError = e.response?.data?.Message || e.response?.data || 'Erro ao criar conta. Tente novamente.'
       } finally {
         this.loading = false
       }
