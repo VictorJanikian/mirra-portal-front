@@ -49,6 +49,7 @@ export interface SchedulingPayload {
 export interface Configuration {
   Id: number
   PlatformId: number
+  PlatformName: string
   Url: string
   Username: string
   Password: string

@@ -4,7 +4,7 @@
       <PlatformIcon :platform-id="configuration.PlatformId" />
       <div class="config-card__info">
         <span class="config-card__platform">{{ platformLabel }}</span>
-        <span class="config-card__url">{{ formatUrl(configuration.Url) }}</span>
+        <span class="config-card__url">{{ formatName(configuration.PlatformName) }}</span>
       </div>
     </div>
     <div class="config-card__meta">
@@ -38,9 +38,9 @@ export default defineComponent({
     }
   },
   methods: {
-    formatUrl(url: string): string {
-      if (!url) return ''
-      return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    formatName(name: string): string {
+      if (!name) return ''
+      return name;
     }
   }
 })

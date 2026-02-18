@@ -86,7 +86,7 @@
                   <span class="config-item__platform-label">{{ platformLabel(config.PlatformId) }}</span>
                 </div>
                 <div class="config-item__details">
-                  <span class="config-item__url">{{ formatUrl(config.Url) }}</span>
+                  <span class="config-item__url">{{ formatName(config.PlatformName) }}</span>
                   <span class="config-item__user">{{ config.Username }}</span>
                 </div>
                 <span class="config-item__badge">
@@ -178,7 +178,7 @@
                     {{ platformLabel(item.platformId) }}
                   </span>
                   <span class="scheduling-card__tag scheduling-card__tag--config">
-                    {{ formatUrl(item.configUrl) }}
+                    {{ formatName(item.configUrl) }}
                   </span>
                   <span v-if="item.scheduling.Interval" class="scheduling-card__tag scheduling-card__tag--cron">
                     {{ item.scheduling.Interval }}
@@ -256,9 +256,9 @@ export default defineComponent({
       const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
       return map[platformId] || 'Plataforma'
     },
-    formatUrl(url: string): string {
-      if (!url) return 'Sem URL'
-      return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    formatName(name: string): string {
+      if (!name) return 'Sem nome'
+      return name;
     },
     isExpanded(id: number): boolean {
       return this.expandedConfigs.includes(id)

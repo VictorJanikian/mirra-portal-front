@@ -36,7 +36,7 @@
                   :class="{ active: expandedConfig === config.Id }"
                   @click="toggleConfig(config.Id)"
                 >
-                  <span class="sidebar__config-url">{{ formatUrl(config.Url) }}</span>
+                  <span class="sidebar__config-url">{{ formatName(config.PlatformName) }}</span>
                   <span class="sidebar__config-badge">{{ (config.Schedulings || []).length }}</span>
                 </button>
 
@@ -141,9 +141,9 @@ export default defineComponent({
     toggleConfig(id: number): void {
       this.expandedConfig = this.expandedConfig === id ? null : id
     },
-    formatUrl(url: string): string {
-      if (!url) return 'Sem URL'
-      return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    formatName(name: string): string {
+      if (!name) return 'Sem nome'
+      return name;
     },
     handleLogout(): void {
       const { logout } = useAuth()
