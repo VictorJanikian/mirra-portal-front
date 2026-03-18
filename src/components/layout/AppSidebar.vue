@@ -86,13 +86,37 @@
     </nav>
 
     <div class="sidebar__footer">
-      <router-link to="/profile" class="sidebar__footer-link">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.2"/>
-          <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-        </svg>
-        Perfil
-      </router-link>
+      <div class="sidebar__footer-submenu">
+        <button
+          class="sidebar__footer-link"
+          :class="{ 'sidebar__footer-link--active': profileExpanded }"
+          @click="profileExpanded = !profileExpanded"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Perfil
+          <svg class="sidebar__expand-icon" :class="{ rotated: profileExpanded }" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4 2L8 6L4 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <transition name="expand">
+          <div v-if="profileExpanded" class="sidebar__footer-subitems">
+            <router-link to="/profile/data" class="sidebar__footer-subitem" active-class="active">
+              Meus dados
+            </router-link>
+            <router-link to="/profile/plan" class="sidebar__footer-subitem" active-class="active">
+              Meu plano
+            </router-link>
+            <router-link to="/profile/payments" class="sidebar__footer-subitem" active-class="active">
+              Pagamentos
+            </router-link>
+          </div>
+        </transition>
+      </div>
+
       <router-link to="/settings" class="sidebar__footer-link">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/>
@@ -125,7 +149,18 @@ export default defineComponent({
   data() {
     return {
       expandedPlatform: null as number | null,
-      expandedConfig: null as number | null
+      expandedConfig: null as number | null,
+      profileExpanded: false
+    }
+  },
+  watch: {
+    '$route.path': {
+      immediate: true,
+      handler(path: string) {
+        if (path.startsWith('/profile')) {
+          this.profileExpanded = true
+        }
+      }
     }
   },
   computed: {
@@ -405,6 +440,40 @@ export default defineComponent({
 .sidebar__footer-link--danger:hover {
   color: var(--color-danger);
   background: var(--color-danger-light);
+}
+
+/* Footer submenu */
+.sidebar__footer-link--active {
+  color: var(--color-primary-dark);
+  background: var(--color-primary-lighter);
+}
+
+.sidebar__footer-subitems {
+  padding-left: var(--spacing-lg);
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.sidebar__footer-subitem {
+  display: block;
+  padding: 6px 12px;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.sidebar__footer-subitem:hover {
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+  text-decoration: none;
+}
+
+.sidebar__footer-subitem.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-weight: 500;
 }
 
 /* Expand transitions */

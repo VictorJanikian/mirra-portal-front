@@ -224,15 +224,97 @@ Com `props: true`, na rota `SchedulingCreate` o prop `schedulingId` fica `null`,
 | Plataforma + credenciais | `Configuration`, `ConfigurationForm`, etc. | **Conexão / Conexões** |
 | Preferências do sistema | `SettingsView` | **Preferências** |
 
+## O que foi feito na sessão 4
+
+### 1. Sistema de Assinatura/Planos — Feature completa
+
+#### Novos tipos (`src/types/index.ts`):
+- `SubscriptionPlan` — `{ Id, Name, MaximumPosts, MaximumConfigurations, Price, PaymentLink }`
+- `UserSubscription` — `{ SubscriptionPlanId, SubscriptionStatusId }`
+
+#### Novo service (`src/services/subscriptionService.ts`):
+- `getPlans()` → `GET /api/subscription/plans`
+- `getUserSubscription()` → `GET /api/Customer/subscription`
+
+#### Novo composable (`src/composables/useSubscription.ts`):
+- Estado global (module-level refs, mesmo padrão de `useConfigurations`)
+- Computed: `sortedPlans`, `currentPlan`, `highestPlan`, `isOnHighestPlan`, `isOnFreePlan`
+- `fetchAll()` carrega planos e assinatura do usuário em paralelo
+
+#### Novo utilitário (`src/utils/formatters.ts`):
+- `formatCurrency(cents)` — converte centavos para U$ formatado (ex: 1400 → "$ 14,00")
+
+#### Seção Perfil reestruturada:
+- **ProfileView.vue deletado** — conteúdo migrado
+- **ProfileLayout.vue** (`src/views/profile/`) — layout com tabs horizontais (Meus dados, Meu plano, Pagamentos)
+- **ProfileDataView.vue** — exibe nome e email do usuário (extraído do antigo ProfileView)
+- **ProfilePlanView.vue** — grid de cards com todos os planos disponíveis:
+  - Ordenados por preço
+  - Plano atual destacado (borda azul, badge "Plano atual", sem botão)
+  - Botão "Assinar" (se no Free) ou "Atualizar" (se já assinante)
+  - Free → redireciona ao PaymentLink do plano; Assinante → redireciona ao Stripe Customer Portal
+  - Exibe: nome, preço formatado (ou "Grátis"), posts semanais, conexões
+- **ProfilePaymentsView.vue** — card com link para gerenciar pagamentos no Stripe
+
+#### Rotas (`src/router/index.ts`):
+- `/profile` agora é rota pai com nested children:
+  - `/profile` → redirect para `/profile/data`
+  - `/profile/data` → ProfileDataView
+  - `/profile/plan` → ProfilePlanView
+  - `/profile/payments` → ProfilePaymentsView
+
+#### Sidebar (`AppSidebar.vue`):
+- "Perfil" agora é botão expansível com submenu (mesmo padrão expand/collapse das plataformas)
+- 3 subitens: "Meus dados", "Meu plano", "Pagamentos"
+- Auto-expande quando a rota atual começa com `/profile` (watcher em `$route.path`)
+
+#### Header (`AppHeader.vue`):
+- Botão "Upgrade" adicionado à esquerda do avatar do usuário
+- Destaque (azul, bold) quando o plano não é o maior
+- Desabilitado (cinza, sem interação) quando já no maior plano
+- Navega para `/profile/plan` ao clicar
+- Dados carregados via `useSubscription().fetchAll()` no `mounted()`
+
+#### Variáveis de ambiente:
+- `.env.development`: `VUE_APP_STRIPE_CUSTOMER_PORTAL=https://billing.stripe.com/p/login/test_14A9AN8IK1Xl8zBgI00oM00`
+- `.env.production`: `VUE_APP_STRIPE_CUSTOMER_PORTAL=PREENCHER_URL_STRIPE_PORTAL`
+
+### Arquivos criados na sessão 4:
+- `src/services/subscriptionService.ts`
+- `src/composables/useSubscription.ts`
+- `src/utils/formatters.ts`
+- `src/views/profile/ProfileLayout.vue`
+- `src/views/profile/ProfileDataView.vue`
+- `src/views/profile/ProfilePlanView.vue`
+- `src/views/profile/ProfilePaymentsView.vue`
+
+### Arquivos modificados na sessão 4:
+- `src/types/index.ts` — interfaces de Subscription
+- `src/router/index.ts` — nested routes para profile
+- `src/components/layout/AppSidebar.vue` — submenu Perfil
+- `src/components/layout/AppHeader.vue` — botão Upgrade
+- `.env.development` — VUE_APP_STRIPE_CUSTOMER_PORTAL
+- `.env.production` — VUE_APP_STRIPE_CUSTOMER_PORTAL
+
+### Arquivos deletados na sessão 4:
+- `src/views/ProfileView.vue` — migrado para `src/views/profile/ProfileDataView.vue`
+
+## Nomenclatura: código vs UI
+
+| Conceito | No código (tipos, variáveis, componentes) | Na UI (textos visíveis ao usuário) |
+|----------|--------------------------------------------|------------------------------------|
+| Plataforma + credenciais | `Configuration`, `ConfigurationForm`, etc. | **Conexão / Conexões** |
+| Preferências do sistema | `SettingsView` | **Preferências** |
+| Plano/Assinatura | `SubscriptionPlan`, `UserSubscription`, `useSubscription` | **Plano / Meu plano** |
+
 ## Funcionalidades ainda placeholder/pendentes
 
 - **SettingsView** (Preferências): mostra "em breve"
-- **ProfileView**: mostra dados do usuário, mas edição é "em breve"
 - **Instagram**: marcado como "Em breve" no sidebar, desabilitado
-- **Nenhum commit foi feito** — todas as mudanças das sessões 2 e 3 estão unstaged
+- **Nenhum commit foi feito** — todas as mudanças das sessões 2, 3 e 4 estão unstaged
 
 ## Estado do build
 
 - Lint: OK (sem erros)
 - Build: OK (compilado com sucesso)
-- **Nenhum commit foi feito nas sessões 2 e 3** — considerar commitar no início da próxima sessão
+- **Nenhum commit foi feito nas sessões 2, 3 e 4** — considerar commitar

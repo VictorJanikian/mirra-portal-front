@@ -8,6 +8,19 @@
 
     <div class="app-header__spacer" />
 
+    <router-link
+      v-if="subscriptionLoaded"
+      to="/profile/plan"
+      class="app-header__upgrade-btn"
+      :class="{ 'app-header__upgrade-btn--disabled': isOnHighestPlan }"
+      :tabindex="isOnHighestPlan ? -1 : 0"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-bottom: 4px;">
+        <path d="M8 2L14 8H10V14H6V8H2L8 2Z" fill="currentColor"/>
+      </svg>
+      {{ isOnHighestPlan ? 'Plano máximo' : 'Upgrade' }}
+    </router-link>
+
     <div class="app-header__user" ref="userMenu">
       <button class="app-header__user-btn" @click="menuOpen = !menuOpen">
         <span class="app-header__avatar">{{ initials }}</span>
@@ -49,6 +62,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useSubscription } from '@/composables/useSubscription'
 
 export default defineComponent({
   name: 'AppHeader',
@@ -66,6 +80,14 @@ export default defineComponent({
       const parts = name.split(' ')
       if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
       return name.substring(0, 2).toUpperCase()
+    },
+    subscriptionLoaded(): boolean {
+      const { plans } = useSubscription()
+      return plans.value.length > 0
+    },
+    isOnHighestPlan(): boolean {
+      const { isOnHighestPlan } = useSubscription()
+      return isOnHighestPlan.value
     }
   },
   methods: {
@@ -83,6 +105,8 @@ export default defineComponent({
   },
   mounted() {
     document.addEventListener('click', this.handleClickOutside)
+    const { fetchAll } = useSubscription()
+    fetchAll()
   },
   beforeUnmount() {
     document.removeEventListener('click', this.handleClickOutside)
@@ -151,6 +175,33 @@ export default defineComponent({
 .app-header__user-name {
   font-size: var(--font-size-sm);
   font-weight: 500;
+}
+
+.app-header__upgrade-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  margin-right: var(--spacing-md);
+}
+
+.app-header__upgrade-btn:hover {
+  background: var(--color-primary-hover);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.app-header__upgrade-btn--disabled {
+  background: var(--color-gray-200);
+  color: var(--color-gray-500);
+  pointer-events: none;
 }
 
 .app-header__dropdown {

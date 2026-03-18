@@ -1,0 +1,60 @@
+import { ref, computed } from 'vue'
+import subscriptionService from '@/services/subscriptionService'
+import type { SubscriptionPlan, UserSubscription } from '@/types'
+
+const plans = ref<SubscriptionPlan[]>([])
+const userSubscription = ref<UserSubscription | null>(null)
+const loading = ref(false)
+const error = ref<string | null>(null)
+
+export function useSubscription() {
+  const sortedPlans = computed(() =>
+    [...plans.value].sort((a, b) => a.Price - b.Price)
+  )
+
+  const currentPlan = computed(() =>
+    plans.value.find(p => p.Id === userSubscription.value?.SubscriptionPlanId) || null
+  )
+
+  const highestPlan = computed(() => {
+    if (plans.value.length === 0) return null
+    return [...plans.value].sort((a, b) => b.Price - a.Price)[0]
+  })
+
+  const isOnHighestPlan = computed(() =>
+    currentPlan.value !== null && currentPlan.value.Id === highestPlan.value?.Id
+  )
+
+  const isOnFreePlan = computed(() =>
+    userSubscription.value?.SubscriptionPlanId === 0
+  )
+
+  async function fetchPlans(): Promise<void> {
+    const { data } = await subscriptionService.getPlans()
+    plans.value = data
+  }
+
+  async function fetchUserSubscription(): Promise<void> {
+    const { data } = await subscriptionService.getUserSubscription()
+    userSubscription.value = data
+  }
+
+  async function fetchAll(): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      await Promise.all([fetchPlans(), fetchUserSubscription()])
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } }
+      error.value = err.response?.data?.message || 'Erro ao carregar planos'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    plans, userSubscription, loading, error,
+    sortedPlans, currentPlan, highestPlan, isOnHighestPlan, isOnFreePlan,
+    fetchPlans, fetchUserSubscription, fetchAll
+  }
+}

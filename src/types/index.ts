@@ -63,6 +63,22 @@ export interface ConfigurationCreatePayload {
   Password: string
 }
 
+// ─── Subscription ─────────────────────────────────────────
+
+export interface SubscriptionPlan {
+  Id: number
+  Name: string
+  MaximumPosts: number
+  MaximumConfigurations: number
+  Price: number
+  PaymentLink: string | null
+}
+
+export interface UserSubscription {
+  SubscriptionPlanId: number
+  SubscriptionStatusId: number
+}
+
 // ─── Toast ─────────────────────────────────────────────────
 
 export type ToastType = 'success' | 'error' | 'info'

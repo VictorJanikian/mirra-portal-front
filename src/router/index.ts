@@ -48,8 +48,28 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'profile',
-        name: 'Profile',
-        component: () => import('@/views/ProfileView.vue')
+        component: () => import('@/views/profile/ProfileLayout.vue'),
+        children: [
+          {
+            path: '',
+            redirect: { name: 'ProfileData' }
+          },
+          {
+            path: 'data',
+            name: 'ProfileData',
+            component: () => import('@/views/profile/ProfileDataView.vue')
+          },
+          {
+            path: 'plan',
+            name: 'ProfilePlan',
+            component: () => import('@/views/profile/ProfilePlanView.vue')
+          },
+          {
+            path: 'payments',
+            name: 'ProfilePayments',
+            component: () => import('@/views/profile/ProfilePaymentsView.vue')
+          }
+        ]
       },
       {
         path: 'settings',
