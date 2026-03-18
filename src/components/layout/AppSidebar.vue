@@ -86,33 +86,46 @@
     </nav>
 
     <div class="sidebar__footer">
-      <div class="sidebar__footer-submenu">
+      <div
+        class="sidebar__footer-popover"
+        @mouseenter="profileHover = true"
+        @mouseleave="profileHover = false"
+      >
         <button
           class="sidebar__footer-link"
-          :class="{ 'sidebar__footer-link--active': profileExpanded }"
-          @click="profileExpanded = !profileExpanded"
+          :class="{ 'sidebar__footer-link--active': $route.path.startsWith('/profile') }"
+          @click="$router.push('/profile/data')"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.2"/>
             <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
           Perfil
-          <svg class="sidebar__expand-icon" :class="{ rotated: profileExpanded }" width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M4 2L8 6L4 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
         </button>
 
-        <transition name="expand">
-          <div v-if="profileExpanded" class="sidebar__footer-subitems">
-            <router-link to="/profile/data" class="sidebar__footer-subitem" active-class="active">
+        <transition name="popover-fade">
+          <div v-if="profileHover" class="sidebar__popover">
+            <button
+              class="sidebar__popover-item"
+              :class="{ active: $route.path === '/profile/data' }"
+              @click="$router.push('/profile/data')"
+            >
               Meus dados
-            </router-link>
-            <router-link to="/profile/plan" class="sidebar__footer-subitem" active-class="active">
+            </button>
+            <button
+              class="sidebar__popover-item"
+              :class="{ active: $route.path === '/profile/plan' }"
+              @click="$router.push('/profile/plan')"
+            >
               Meu plano
-            </router-link>
-            <router-link to="/profile/payments" class="sidebar__footer-subitem" active-class="active">
+            </button>
+            <button
+              class="sidebar__popover-item"
+              :class="{ active: $route.path === '/profile/payments' }"
+              @click="$router.push('/profile/payments')"
+            >
               Pagamentos
-            </router-link>
+            </button>
           </div>
         </transition>
       </div>
@@ -150,19 +163,10 @@ export default defineComponent({
     return {
       expandedPlatform: null as number | null,
       expandedConfig: null as number | null,
-      profileExpanded: false
+      profileHover: false
     }
   },
-  watch: {
-    '$route.path': {
-      immediate: true,
-      handler(path: string) {
-        if (path.startsWith('/profile')) {
-          this.profileExpanded = true
-        }
-      }
-    }
-  },
+  watch: {},
   computed: {
     wordpressConfigs(): Configuration[] {
       const { configurations } = useConfigurations()
@@ -205,7 +209,7 @@ export default defineComponent({
   left: 0;
   top: 0;
   z-index: 100;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .sidebar__header {
@@ -442,38 +446,73 @@ export default defineComponent({
   background: var(--color-danger-light);
 }
 
-/* Footer submenu */
+/* Footer profile link active */
 .sidebar__footer-link--active {
   color: var(--color-primary-dark);
   background: var(--color-primary-lighter);
 }
 
-.sidebar__footer-subitems {
-  padding-left: var(--spacing-lg);
-  margin-top: var(--spacing-xs);
-  margin-bottom: var(--spacing-xs);
+/* Profile popover */
+.sidebar__footer-popover {
+  position: relative;
 }
 
-.sidebar__footer-subitem {
+.sidebar__popover {
+  position: absolute;
+  left: 100%;
+  bottom: 0;
+  margin-left: 8px;
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  padding: 0;
+  min-width: 160px;
+  z-index: 200;
+  overflow: hidden;
+}
+
+.sidebar__popover-item {
   display: block;
-  padding: 6px 12px;
-  font-size: var(--font-size-xs);
-  color: var(--color-gray-500);
-  border-radius: var(--border-radius-sm);
+  width: 100%;
+  padding: 8px 14px;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  border-radius: 0;
   transition: all var(--transition-fast);
   text-decoration: none;
+  white-space: nowrap;
+  text-align: left;
 }
 
-.sidebar__footer-subitem:hover {
+.sidebar__popover-item:hover {
   background: var(--color-gray-100);
-  color: var(--color-gray-700);
+  color: var(--color-gray-800);
   text-decoration: none;
 }
 
-.sidebar__footer-subitem.active {
+.sidebar__popover-item.active {
   background: var(--color-primary-light);
   color: var(--color-primary-dark);
   font-weight: 500;
+}
+
+/* Popover transition */
+.popover-fade-enter-active,
+.popover-fade-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.popover-fade-enter-from,
+.popover-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-4px);
+}
+
+.popover-fade-enter-to,
+.popover-fade-leave-from {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* Expand transitions */
