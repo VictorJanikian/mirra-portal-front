@@ -144,7 +144,7 @@ export default defineComponent({
 
         if (this.currentSchedulingId) {
           const updated = await this.api.update(this.currentSchedulingId, payload)
-          this.currentScheduling = updated
+          this.currentScheduling = { ...updated, Status: 0 }
           success('Agendamento atualizado com sucesso!')
         } else {
           const created = await this.api.create(payload)
