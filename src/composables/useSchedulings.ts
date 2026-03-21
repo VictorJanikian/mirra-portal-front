@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import schedulingService from '@/services/schedulingService'
+import configurationService from '@/services/configurationService'
 import type { Scheduling, SchedulingPayload } from '@/types'
 
 export function useSchedulings(configId: string | number) {
@@ -12,8 +13,8 @@ export function useSchedulings(configId: string | number) {
     loading.value = true
     error.value = null
     try {
-      const { data } = await schedulingService.getAll(configId)
-      schedulings.value = data
+      const { data } = await configurationService.get(configId)
+      schedulings.value = data.Schedulings || []
     } catch (e: unknown) {
       const err = e as { response?: { data?: { message?: string } } }
       error.value = err.response?.data?.message || 'Erro ao carregar agendamentos'

@@ -7,10 +7,6 @@ function basePath(configId: string | number): string {
 }
 
 export default {
-  getAll(configId: string | number): Promise<AxiosResponse<Scheduling[]>> {
-    return api.get(basePath(configId))
-  },
-
   get(configId: string | number, schedulingId: string | number): Promise<AxiosResponse<Scheduling>> {
     return api.get(`${basePath(configId)}/${schedulingId}`)
   },
