@@ -1,6 +1,15 @@
 <template>
   <div class="scheduling-form fade-in">
-    <h2 class="scheduling-form__title">{{ isEditing ? 'Editar Agendamento' : 'Novo Agendamento' }}</h2>
+    <div class="scheduling-form__title-row">
+      <h2 class="scheduling-form__title">{{ isEditing ? 'Editar Agendamento' : 'Novo Agendamento' }}</h2>
+      <span
+        v-if="isEditing && scheduling"
+        class="scheduling-form__status"
+        :class="scheduling.Status === 0 ? 'scheduling-form__status--active' : 'scheduling-form__status--inactive'"
+      >
+        {{ statusLabel }}
+      </span>
+    </div>
 
     <form @submit.prevent="handleSubmit" class="scheduling-form__fields">
       <BaseInput
@@ -142,6 +151,14 @@ export default defineComponent({
   computed: {
     isEditing(): boolean {
       return !!this.scheduling?.Id
+    },
+    statusLabel(): string {
+      const status = this.scheduling?.Status
+      if (status === 0) return 'Ativo'
+      if (status === 1) return 'Inativo por falta de pagamento'
+      if (status === 2) return 'Suspenso por downgrade do plano'
+      if (status === 3) return 'Cancelado'
+      return 'Inativo'
     }
   },
   methods: {
@@ -203,11 +220,36 @@ export default defineComponent({
   min-width: 0;
 }
 
+.scheduling-form__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
 .scheduling-form__title {
   font-size: var(--font-size-xl);
   font-weight: 600;
-  margin-bottom: var(--spacing-xl);
   color: var(--color-gray-900);
+  margin: 0;
+}
+
+.scheduling-form__status {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.scheduling-form__status--active {
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.scheduling-form__status--inactive {
+  color: #b91c1c;
+  background: #fef2f2;
 }
 
 .scheduling-form__fields {

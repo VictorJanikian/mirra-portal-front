@@ -122,6 +122,12 @@
                       </span>
                     </div>
                     <div class="scheduling-row__meta">
+                      <span
+                        class="scheduling-row__status"
+                        :class="scheduling.Status === 0 ? 'scheduling-row__status--active' : 'scheduling-row__status--inactive'"
+                      >
+                        {{ scheduling.Status === 0 ? 'Ativo' : 'Inativo' }}
+                      </span>
                       <span v-if="scheduling.Interval" class="scheduling-row__interval">
                         {{ scheduling.Interval }}
                       </span>
@@ -183,6 +189,12 @@
                   <span v-if="item.scheduling.Interval" class="scheduling-card__tag scheduling-card__tag--cron">
                     {{ item.scheduling.Interval }}
                   </span>
+                  <span
+                    class="scheduling-card__tag"
+                    :class="item.scheduling.Status === 0 ? 'scheduling-card__tag--status-active' : 'scheduling-card__tag--status-inactive'"
+                  >
+                    {{ item.scheduling.Status === 0 ? 'Ativo' : 'Inativo' }}
+                  </span>
                 </div>
               </div>
               <svg class="scheduling-card__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -234,7 +246,8 @@ export default defineComponent({
       return this.configurations.length
     },
     totalSchedulings(): number {
-      return this.configurations.reduce((sum: number, c: Configuration) => sum + (c.Schedulings || []).length, 0)
+      return this.configurations.reduce((sum: number, c: Configuration) =>
+        sum + (c.Schedulings || []).filter((s: Scheduling) => s.Status === 0).length, 0)
     },
     allSchedulings(): SchedulingItem[] {
       const result: SchedulingItem[] = []
@@ -628,6 +641,23 @@ export default defineComponent({
   border-radius: var(--border-radius-sm);
 }
 
+.scheduling-row__status {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.scheduling-row__status--active {
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.scheduling-row__status--inactive {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
 .scheduling-row__arrow {
   color: var(--color-gray-400);
 }
@@ -736,6 +766,18 @@ export default defineComponent({
   color: var(--color-gray-500);
   background: var(--color-gray-100);
   font-family: monospace;
+}
+
+.scheduling-card__tag--status-active {
+  color: #15803d;
+  background: #f0fdf4;
+  font-weight: 600;
+}
+
+.scheduling-card__tag--status-inactive {
+  color: #b91c1c;
+  background: #fef2f2;
+  font-weight: 600;
 }
 
 .scheduling-card__arrow {

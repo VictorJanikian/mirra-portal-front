@@ -36,6 +36,7 @@ export interface SchedulingParameters {
 export interface Scheduling {
   Id: number
   Interval: string
+  Status: number
   Parameters: SchedulingParameters
 }
 

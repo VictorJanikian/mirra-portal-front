@@ -24,7 +24,15 @@
           :class="{ active: scheduling.Id === activeId }"
           @click="$emit('select', scheduling)"
         >
-          {{ scheduling.Parameters?.ThemeTitle || `Agendamento #${scheduling.Id}` }}
+          <span class="scheduling-item__label">
+            {{ scheduling.Parameters?.ThemeTitle || `Agendamento #${scheduling.Id}` }}
+          </span>
+          <span
+            class="scheduling-item__status"
+            :class="scheduling.Status === 0 ? 'scheduling-item__status--active' : 'scheduling-item__status--inactive'"
+          >
+            {{ scheduling.Status === 0 ? 'Ativo' : 'Inativo' }}
+          </span>
         </div>
       </li>
 
@@ -103,7 +111,33 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--spacing-sm);
   color: var(--color-gray-700);
+}
+
+.scheduling-item__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scheduling-item__status {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.scheduling-item__status--active {
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.scheduling-item__status--inactive {
+  color: #b91c1c;
+  background: #fef2f2;
 }
 
 .scheduling-item:hover {

@@ -93,12 +93,14 @@ export default defineComponent({
       const result: SchedulingItem[] = []
       for (const config of this.configurations) {
         for (const scheduling of (config.Schedulings || [])) {
-          result.push({
-            configId: config.Id,
-            configUrl: config.Url,
-            platformId: config.PlatformId,
-            scheduling
-          })
+          if (scheduling.Status === 0) {
+            result.push({
+              configId: config.Id,
+              configUrl: config.Url,
+              platformId: config.PlatformId,
+              scheduling
+            })
+          }
         }
       }
       return result
