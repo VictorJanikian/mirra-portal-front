@@ -74,8 +74,7 @@ export default defineComponent({
       errors: {} as Record<string, string>,
       loading: false,
       platformOptions: [
-        { value: '1', label: 'WordPress' },
-        { value: '2', label: 'Instagram' }
+        { value: '1', label: 'WordPress' }
       ] as SelectOption[]
     }
   },
