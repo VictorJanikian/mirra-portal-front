@@ -36,12 +36,22 @@
         </div>
       </li>
 
-      <li>
+      <li class="scheduling-list__add-wrapper">
         <div
+          v-if="canCreate"
           class="scheduling-item scheduling-item--add"
           @click="$emit('create')"
         >
           + Criar novo
+        </div>
+        <div v-else class="scheduling-item scheduling-item--add scheduling-item--disabled">
+          <SvgIcon name="lock" :size="12" class="scheduling-list__lock-icon" />
+          Criar novo
+        </div>
+        <div v-if="!canCreate" class="scheduling-list__limit-tooltip">
+          Você atingiu o número máximo de posts semanais para essa conexão.
+          <router-link :to="{ name: 'ProfilePlan' }" class="scheduling-list__limit-tooltip-link">Clique aqui</router-link>
+          para atualizar seu plano.
         </div>
       </li>
     </ul>
@@ -50,13 +60,16 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
+import SvgIcon from '@/components/ui/SvgIcon.vue'
 import type { Scheduling } from '@/types'
 
 export default defineComponent({
   name: 'SchedulingList',
+  components: { SvgIcon },
   props: {
     schedulings: { type: Array as PropType<Scheduling[]>, default: () => [] },
-    activeId: { type: Number, default: null }
+    activeId: { type: Number, default: null },
+    canCreate: { type: Boolean, default: true }
   },
   emits: ['select', 'create', 'delete']
 })
@@ -162,6 +175,75 @@ export default defineComponent({
 .scheduling-item--add:hover {
   background: var(--color-primary-hover);
   color: var(--color-white);
+}
+
+.scheduling-item--disabled {
+  background: var(--color-gray-200);
+  color: var(--color-gray-500);
+  cursor: not-allowed;
+}
+
+.scheduling-item--disabled:hover {
+  background: var(--color-gray-200);
+  color: var(--color-gray-500);
+}
+
+.scheduling-list__lock-icon {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.scheduling-list__add-wrapper {
+  position: relative;
+}
+
+.scheduling-list__limit-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 10px 14px;
+  border-radius: var(--border-radius, 8px);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  width: 100%;
+  text-align: left;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.scheduling-list__limit-tooltip::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  height: 12px;
+}
+
+.scheduling-list__limit-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 24px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #1e293b transparent;
+}
+
+.scheduling-list__add-wrapper:hover .scheduling-list__limit-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.scheduling-list__limit-tooltip-link {
+  color: #60a5fa;
+  text-decoration: underline;
 }
 
 .scheduling-item-delete {

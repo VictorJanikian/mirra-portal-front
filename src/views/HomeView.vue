@@ -75,10 +75,7 @@
             :disabled="!canCreateConfig"
             @click="canCreateConfig && openNewConfig(1)"
           >
-            <svg v-if="!canCreateConfig" class="home__lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
-              <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+            <SvgIcon v-if="!canCreateConfig" name="lock" :size="12" class="home__lock-icon" />
             Conectar site ou perfil
           </button>
           <div v-if="!canCreateConfig" class="home__limit-tooltip">
@@ -101,10 +98,7 @@
                 :disabled="!canCreateConfig"
                 @click="canCreateConfig && openNewConfig(1)"
               >
-                <svg v-if="!canCreateConfig" class="home__lock-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
-                  <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
+                <SvgIcon v-if="!canCreateConfig" name="lock" :size="12" class="home__lock-icon" />
                 {{ canCreateConfig ? '+ Nova Conexão' : 'Nova Conexão' }}
               </button>
               <div v-if="!canCreateConfig" class="home__limit-tooltip">
@@ -190,10 +184,7 @@
                       + Novo Agendamento
                     </router-link>
                     <span v-else class="config-item__add-scheduling config-item__add-scheduling--disabled">
-                      <svg class="home__lock-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
-                        <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
-                        <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                      </svg>
+                      <SvgIcon name="lock" :size="12" class="home__lock-icon" />
                       Novo Agendamento
                     </span>
                     <div v-if="config.RemainingRunsPerWeek <= 0" class="home__limit-tooltip home__limit-tooltip--left">
@@ -271,6 +262,7 @@
 import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
+import SvgIcon from '@/components/ui/SvgIcon.vue'
 import schedulingService from '@/services/schedulingService'
 import subscriptionService from '@/services/subscriptionService'
 import type { Configuration, Scheduling } from '@/types'
@@ -284,7 +276,7 @@ interface SchedulingItem {
 
 export default defineComponent({
   name: 'HomeView',
-  components: { PlatformIcon },
+  components: { PlatformIcon, SvgIcon },
   inject: {
     openNewConfigurationModal: { default: () => function noop() { /* noop */ } }
   },
@@ -548,9 +540,9 @@ export default defineComponent({
 }
 
 .home__empty-btn--disabled {
-  background: var(--color-gray-300);
+  background: var(--color-gray-200);
+  color: var(--color-gray-500);
   cursor: not-allowed;
-  opacity: 0.7;
 }
 
 /* Section header */
@@ -582,9 +574,9 @@ export default defineComponent({
 }
 
 .home__new-config-btn--disabled {
-  background: var(--color-gray-300);
+  background: var(--color-gray-200);
+  color: var(--color-gray-500);
   cursor: not-allowed;
-  opacity: 0.7;
 }
 
 /* Btn wrapper + tooltip */

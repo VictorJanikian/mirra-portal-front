@@ -9,6 +9,7 @@
       <SchedulingList
         :schedulings="schedulings"
         :active-id="currentSchedulingId"
+        :can-create="canCreateScheduling"
         @select="onSelectScheduling"
         @create="onCreateNew"
         @delete="onDeleteScheduling"
@@ -77,6 +78,11 @@ export default defineComponent({
   computed: {
     api(): ReturnType<typeof useSchedulings> {
       return this.schedulingApi as unknown as ReturnType<typeof useSchedulings>
+    },
+    canCreateScheduling(): boolean {
+      const { configurations } = useConfigurations()
+      const config = configurations.value.find(c => c.Id === Number(this.configId))
+      return (config?.RemainingRunsPerWeek ?? 1) > 0
     }
   },
   watch: {

@@ -73,10 +73,7 @@
                   :disabled="!canCreateConfig"
                   @click="canCreateConfig && $emit('new-configuration', 1)"
                 >
-                  <svg v-if="!canCreateConfig" class="sidebar__lock-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
-                    <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
+                  <SvgIcon v-if="!canCreateConfig" name="lock" :size="12" class="sidebar__lock-icon" />
                   {{ canCreateConfig ? '+ Conectar site' : 'Conectar site' }}
                 </button>
                 <teleport to="body">
@@ -180,10 +177,12 @@ import { defineComponent } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useConfigurations } from '@/composables/useConfigurations'
 import subscriptionService from '@/services/subscriptionService'
+import SvgIcon from '@/components/ui/SvgIcon.vue'
 import type { Configuration } from '@/types'
 
 export default defineComponent({
   name: 'AppSidebar',
+  components: { SvgIcon },
   emits: ['new-configuration'],
   props: {
     mobileOpen: { type: Boolean, default: false }

@@ -40,6 +40,10 @@ const icons: Record<string, IconDef> = {
   'external-link': {
     viewBox: '0 0 16 16',
     content: '<path d="M6 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1v-3M9 1h6m0 0v6m0-6L8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
+  },
+  lock: {
+    viewBox: '0 0 24 24',
+    content: '<rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
   }
 }
 
