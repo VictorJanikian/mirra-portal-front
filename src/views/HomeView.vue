@@ -5,6 +5,18 @@
       <p class="home__subtitle">Bem-vindo à Mirra AI. Gerencie seus agendamentos de conteúdo automatizado.</p>
     </div>
 
+    <div v-if="hasSuspendedNopayment" class="home__banner home__banner--warning">
+      Você tem agendamentos suspensos por pendências no pagamento.
+      <a :href="stripePortalUrl" target="_blank" rel="noopener" class="home__banner-link">Regularize seu pagamento</a>
+      ou limite o número de postagens semanais.
+    </div>
+
+    <div v-if="hasSuspendedDowngrade" class="home__banner home__banner--warning">
+      Você tem agendamentos suspensos por downgrade do plano.
+      <router-link :to="{ name: 'ProfilePlan' }" class="home__banner-link">Atualize seu plano</router-link>
+      ou diminua o número de postagens semanais.
+    </div>
+
     <div v-if="loading" class="home__loading">
       <span class="spinner" style="border-color: rgba(37,99,235,0.2); border-top-color: #2563eb;" />
       <span>Carregando...</span>
@@ -212,6 +224,7 @@
 import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
+import schedulingService from '@/services/schedulingService'
 import type { Configuration, Scheduling } from '@/types'
 
 interface SchedulingItem {
@@ -230,8 +243,18 @@ export default defineComponent({
   data() {
     return {
       activeTab: 'configurations' as string,
-      expandedConfigs: [] as number[]
+      expandedConfigs: [] as number[],
+      hasSuspendedNopayment: false,
+      hasSuspendedDowngrade: false
     }
+  },
+  async mounted() {
+    const [nopayment, downgrade] = await Promise.all([
+      schedulingService.hasSuspendedNopayment().catch(() => ({ data: false })),
+      schedulingService.hasSuspendedDowngrade().catch(() => ({ data: false }))
+    ])
+    this.hasSuspendedNopayment = nopayment.data
+    this.hasSuspendedDowngrade = downgrade.data
   },
   computed: {
     loading(): boolean {
@@ -248,6 +271,9 @@ export default defineComponent({
     totalSchedulings(): number {
       return this.configurations.reduce((sum: number, c: Configuration) =>
         sum + (c.Schedulings || []).filter((s: Scheduling) => s.Status === 0).length, 0)
+    },
+    stripePortalUrl(): string {
+      return process.env.VUE_APP_STRIPE_CUSTOMER_PORTAL || ''
     },
     allSchedulings(): SchedulingItem[] {
       const result: SchedulingItem[] = []
@@ -305,6 +331,26 @@ export default defineComponent({
 .home__subtitle {
   color: var(--color-gray-500);
   font-size: var(--font-size-base);
+}
+
+.home__banner {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.5;
+}
+
+.home__banner--warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.home__banner-link {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .home__loading {

@@ -3,12 +3,19 @@
     <div class="scheduling-form__title-row">
       <h2 class="scheduling-form__title">{{ isEditing ? 'Editar Agendamento' : 'Novo Agendamento' }}</h2>
       <span
-        v-if="isEditing && scheduling"
+        v-if="isEditing && scheduling && scheduling.Status !== 2"
         class="scheduling-form__status"
         :class="scheduling.Status === 0 ? 'scheduling-form__status--active' : 'scheduling-form__status--inactive'"
       >
         {{ statusLabel }}
       </span>
+    </div>
+
+    <div v-if="isEditing && scheduling && scheduling.Status === 2" class="scheduling-form__banner">
+      Suspenso por downgrade do plano.
+      <br>
+      <router-link :to="{ name: 'ProfilePlan' }" class="scheduling-form__banner-link">Atualize seu plano</router-link>
+      ou diminua o número de postagens semanais dessa conexão.
     </div>
 
     <form @submit.prevent="handleSubmit" class="scheduling-form__fields">
@@ -156,7 +163,6 @@ export default defineComponent({
       const status = this.scheduling?.Status
       if (status === 0) return 'Ativo'
       if (status === 1) return 'Inativo por falta de pagamento'
-      if (status === 2) return 'Suspenso por downgrade do plano'
       if (status === 3) return 'Cancelado'
       return 'Inativo'
     }
@@ -250,6 +256,23 @@ export default defineComponent({
 .scheduling-form__status--inactive {
   color: #b91c1c;
   background: #fef2f2;
+}
+
+.scheduling-form__banner {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: var(--border-radius, 8px);
+  padding: 12px 16px;
+  font-size: var(--font-size-sm, 14px);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-lg, 16px);
+}
+
+.scheduling-form__banner-link {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .scheduling-form__fields {

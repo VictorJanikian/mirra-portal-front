@@ -7,6 +7,14 @@ function basePath(configId: string | number): string {
 }
 
 export default {
+  hasSuspendedNopayment(): Promise<AxiosResponse<boolean>> {
+    return api.get('/api/Scheduling/has-suspended-nopayment')
+  },
+
+  hasSuspendedDowngrade(): Promise<AxiosResponse<boolean>> {
+    return api.get('/api/Scheduling/has-suspended-downgrade')
+  },
+
   get(configId: string | number, schedulingId: string | number): Promise<AxiosResponse<Scheduling>> {
     return api.get(`${basePath(configId)}/${schedulingId}`)
   },
