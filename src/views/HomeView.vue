@@ -68,9 +68,25 @@
         </div>
         <h3>Nenhuma conexão encontrada</h3>
         <p>Comece conectando uma plataforma para criar agendamentos de conteúdo.</p>
-        <button class="home__empty-btn" @click="openNewConfig(1)">
-          Conectar site ou perfil
-        </button>
+        <div class="home__btn-wrapper">
+          <button
+            class="home__empty-btn"
+            :class="{ 'home__empty-btn--disabled': !canCreateConfig }"
+            :disabled="!canCreateConfig"
+            @click="canCreateConfig && openNewConfig(1)"
+          >
+            <svg v-if="!canCreateConfig" class="home__lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Conectar site ou perfil
+          </button>
+          <div v-if="!canCreateConfig" class="home__limit-tooltip">
+            Você atingiu o número máximo de conexões disponíveis no seu plano.
+            <router-link :to="{ name: 'ProfilePlan' }" class="home__limit-tooltip-link">Clique aqui</router-link>
+            para atualizar o plano.
+          </div>
+        </div>
       </div>
 
       <!-- Tab: Conexões -->
@@ -78,9 +94,25 @@
         <div v-if="activeTab === 'configurations' && totalConfigs > 0" key="configurations">
           <div class="home__section-header">
             <h2 class="home__section-title">Suas Conexões</h2>
-            <button class="home__new-config-btn" @click="openNewConfig(1)">
-              + Nova Conexão
-            </button>
+            <div class="home__btn-wrapper">
+              <button
+                class="home__new-config-btn"
+                :class="{ 'home__new-config-btn--disabled': !canCreateConfig }"
+                :disabled="!canCreateConfig"
+                @click="canCreateConfig && openNewConfig(1)"
+              >
+                <svg v-if="!canCreateConfig" class="home__lock-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                {{ canCreateConfig ? '+ Nova Conexão' : 'Nova Conexão' }}
+              </button>
+              <div v-if="!canCreateConfig" class="home__limit-tooltip">
+                Você atingiu o número máximo de conexões disponíveis no seu plano.
+                <router-link :to="{ name: 'ProfilePlan' }" class="home__limit-tooltip-link">Clique aqui</router-link>
+                para atualizar o plano.
+              </div>
+            </div>
           </div>
 
           <div class="home__configs">
@@ -149,12 +181,27 @@
                     </div>
                   </router-link>
 
-                  <router-link
-                    :to="`/configurations/${config.Id}/schedulings/new`"
-                    class="config-item__add-scheduling"
-                  >
-                    + Novo Agendamento
-                  </router-link>
+                  <div class="home__btn-wrapper">
+                    <router-link
+                      v-if="config.RemainingRunsPerWeek > 0"
+                      :to="`/configurations/${config.Id}/schedulings/new`"
+                      class="config-item__add-scheduling"
+                    >
+                      + Novo Agendamento
+                    </router-link>
+                    <span v-else class="config-item__add-scheduling config-item__add-scheduling--disabled">
+                      <svg class="home__lock-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                      Novo Agendamento
+                    </span>
+                    <div v-if="config.RemainingRunsPerWeek <= 0" class="home__limit-tooltip home__limit-tooltip--left">
+                      Você atingiu o número máximo de posts semanais para essa conexão.
+                      <router-link :to="{ name: 'ProfilePlan' }" class="home__limit-tooltip-link">Clique aqui</router-link>
+                      para atualizar seu plano.
+                    </div>
+                  </div>
                 </div>
               </transition>
             </div>
@@ -225,6 +272,7 @@ import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
 import schedulingService from '@/services/schedulingService'
+import subscriptionService from '@/services/subscriptionService'
 import type { Configuration, Scheduling } from '@/types'
 
 interface SchedulingItem {
@@ -245,16 +293,19 @@ export default defineComponent({
       activeTab: 'configurations' as string,
       expandedConfigs: [] as number[],
       hasSuspendedNopayment: false,
-      hasSuspendedDowngrade: false
+      hasSuspendedDowngrade: false,
+      canCreateConfig: true
     }
   },
   async mounted() {
-    const [nopayment, downgrade] = await Promise.all([
+    const [nopayment, downgrade, remaining] = await Promise.all([
       schedulingService.hasSuspendedNopayment().catch(() => ({ data: false })),
-      schedulingService.hasSuspendedDowngrade().catch(() => ({ data: false }))
+      schedulingService.hasSuspendedDowngrade().catch(() => ({ data: false })),
+      subscriptionService.getRemainingConfigurations().catch(() => ({ data: { remainingConfigurations: 1 } }))
     ])
     this.hasSuspendedNopayment = nopayment.data
     this.hasSuspendedDowngrade = downgrade.data
+    this.canCreateConfig = remaining.data.remainingConfigurations > 0
   },
   computed: {
     loading(): boolean {
@@ -492,8 +543,14 @@ export default defineComponent({
   transition: background var(--transition-fast);
 }
 
-.home__empty-btn:hover {
+.home__empty-btn:hover:not(:disabled) {
   background: var(--color-primary-dark);
+}
+
+.home__empty-btn--disabled {
+  background: var(--color-gray-300);
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* Section header */
@@ -520,8 +577,74 @@ export default defineComponent({
   transition: background var(--transition-fast);
 }
 
-.home__new-config-btn:hover {
+.home__new-config-btn:hover:not(:disabled) {
   background: var(--color-primary-dark);
+}
+
+.home__new-config-btn--disabled {
+  background: var(--color-gray-300);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Btn wrapper + tooltip */
+.home__btn-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.home__lock-icon {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.home__limit-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 10px 14px;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  width: 300px;
+  text-align: left;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.home__limit-tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 12px;
+}
+
+.home__limit-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 24px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: #1e293b transparent transparent transparent;
+}
+
+.home__btn-wrapper:hover .home__limit-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.home__limit-tooltip-link {
+  color: #60a5fa;
+  text-decoration: underline;
 }
 
 /* Configuration items */
@@ -727,6 +850,25 @@ export default defineComponent({
 .config-item__add-scheduling:hover {
   background: var(--color-primary-light);
   text-decoration: none;
+}
+
+.config-item__add-scheduling--disabled {
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+}
+
+.config-item__add-scheduling--disabled:hover {
+  background: none;
+}
+
+.home__limit-tooltip--left {
+  right: auto;
+  left: 0;
+}
+
+.home__limit-tooltip--left::after {
+  right: auto;
+  left: 24px;
 }
 
 /* Scheduling cards (tab agendamentos) */

@@ -9,5 +9,9 @@ export default {
 
   getUserSubscription(): Promise<AxiosResponse<UserSubscription>> {
     return api.get('/api/Customer/subscription')
+  },
+
+  getRemainingConfigurations(): Promise<AxiosResponse<{ remainingConfigurations: number }>> {
+    return api.get('/api/subscription/remaining-configurations')
   }
 }

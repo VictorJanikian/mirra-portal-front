@@ -313,8 +313,49 @@ Com `props: true`, na rota `SchedulingCreate` o prop `schedulingId` fica `null`,
 - **Instagram**: marcado como "Em breve" no sidebar, desabilitado
 - **Nenhum commit foi feito** — todas as mudanças das sessões 2, 3 e 4 estão unstaged
 
+## O que foi feito na sessão 5
+
+### 1. Banners de suspensão na Home (HomeView.vue)
+
+Dois novos endpoints são chamados no `mounted()` em paralelo:
+- `GET /api/Scheduling/has-suspended-nopayment` → banner "agendamentos suspensos por pendências no pagamento" com link para Stripe Customer Portal
+- `GET /api/Scheduling/has-suspended-downgrade` → banner "agendamentos suspensos por downgrade" com link para página de planos (`ProfilePlan`)
+
+Métodos adicionados em `schedulingService.ts`: `hasSuspendedNopayment()`, `hasSuspendedDowngrade()`.
+
+### 2. Banner de suspensão no formulário de agendamento (SchedulingForm.vue)
+
+Quando `scheduling.Status === 2` (downgrade), exibe um banner amarelo separado (não mais dentro do badge de status) com link "Atualize seu plano" apontando para `ProfilePlan`.
+
+### 3. Link "Atualize seu plano" no SchedulingForm
+
+O texto "Atualize seu plano" no banner de status 2 é um `<router-link>` para a rota `ProfilePlan`.
+
+### 4. Limite de conexões — botões desabilitados com tooltip
+
+Novo endpoint: `GET /api/subscription/remaining-configurations` → `{ remainingConfigurations: number }`.
+Método adicionado em `subscriptionService.ts`: `getRemainingConfigurations()`.
+
+Quando `remainingConfigurations <= 0`, os seguintes botões ficam desabilitados com ícone de cadeado e tooltip no hover:
+- **HomeView**: "Conectar site ou perfil" (empty state) e "+ Nova Conexão" (section header)
+- **AppSidebar**: "+ Conectar site" (dentro da lista WordPress) — tooltip usa `<teleport to="body">` com posição fixed calculada via JS para evitar corte pelo `overflow-y: auto` do nav
+
+Tooltip reutiliza classes `home__btn-wrapper` e `home__limit-tooltip` com modificador `--left` para variante alinhada à esquerda.
+
+### 5. Limite de posts semanais por conexão — "+ Novo Agendamento" desabilitado
+
+O campo `RemainingRunsPerWeek` (vindo de `GET /configuration`) é usado na HomeView: quando `<= 0`, o link "+ Novo Agendamento" dentro da conexão expandida fica desabilitado com cadeado e tooltip.
+
+Tipo `Configuration` atualizado em `src/types/index.ts` com campo `RemainingRunsPerWeek: number`.
+
+### Arquivos modificados na sessão 5:
+- `src/views/HomeView.vue` — banners, tooltips de limite, botões desabilitados
+- `src/components/scheduling/SchedulingForm.vue` — banner amarelo para status 2
+- `src/components/layout/AppSidebar.vue` — botão desabilitado com tooltip teleportado
+- `src/services/schedulingService.ts` — `hasSuspendedNopayment()`, `hasSuspendedDowngrade()`
+- `src/services/subscriptionService.ts` — `getRemainingConfigurations()`
+- `src/types/index.ts` — `RemainingRunsPerWeek` na interface `Configuration`
+
 ## Estado do build
 
-- Lint: OK (sem erros)
-- Build: OK (compilado com sucesso)
-- **Nenhum commit foi feito nas sessões 2, 3 e 4** — considerar commitar
+- **Nenhum commit foi feito nas sessões 2, 3, 4 e 5** — considerar commitar

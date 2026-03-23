@@ -62,9 +62,37 @@
                 </transition>
               </div>
 
-              <button class="sidebar__add-config" @click="$emit('new-configuration', 1)">
-                + Conectar site
-              </button>
+              <div
+                class="sidebar__add-config-wrapper"
+                @mouseenter="showConfigTooltip"
+                @mouseleave="hideConfigTooltip"
+              >
+                <button
+                  class="sidebar__add-config"
+                  :class="{ 'sidebar__add-config--disabled': !canCreateConfig }"
+                  :disabled="!canCreateConfig"
+                  @click="canCreateConfig && $emit('new-configuration', 1)"
+                >
+                  <svg v-if="!canCreateConfig" class="sidebar__lock-icon" width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  {{ canCreateConfig ? '+ Conectar site' : 'Conectar site' }}
+                </button>
+                <teleport to="body">
+                  <div
+                    v-if="!canCreateConfig && configTooltipVisible"
+                    class="sidebar__limit-tooltip"
+                    :style="configTooltipStyle"
+                    @mouseenter="keepConfigTooltip"
+                    @mouseleave="hideConfigTooltip"
+                  >
+                    Você atingiu o número máximo de conexões disponíveis no seu plano.
+                    <router-link :to="{ name: 'ProfilePlan' }" class="sidebar__limit-tooltip-link">Clique aqui</router-link>
+                    para atualizar o plano.
+                  </div>
+                </teleport>
+              </div>
             </div>
           </transition>
         </div>
@@ -151,6 +179,7 @@
 import { defineComponent } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useConfigurations } from '@/composables/useConfigurations'
+import subscriptionService from '@/services/subscriptionService'
 import type { Configuration } from '@/types'
 
 export default defineComponent({
@@ -163,7 +192,11 @@ export default defineComponent({
     return {
       expandedPlatform: null as number | null,
       expandedConfig: null as number | null,
-      profileHover: false
+      profileHover: false,
+      canCreateConfig: true,
+      configTooltipVisible: false,
+      configTooltipStyle: {} as Record<string, string>,
+      configTooltipTimer: null as ReturnType<typeof setTimeout> | null
     }
   },
   watch: {},
@@ -187,12 +220,46 @@ export default defineComponent({
     handleLogout(): void {
       const { logout } = useAuth()
       logout()
+    },
+    showConfigTooltip(e: MouseEvent): void {
+      if (this.canCreateConfig) return
+      if (this.configTooltipTimer) {
+        clearTimeout(this.configTooltipTimer)
+        this.configTooltipTimer = null
+      }
+      const el = e.currentTarget as HTMLElement
+      const rect = el.getBoundingClientRect()
+      this.configTooltipStyle = {
+        position: 'fixed',
+        left: `${rect.right + 4}px`,
+        top: `${rect.top + rect.height / 2}px`,
+        transform: 'translateY(-50%)'
+      }
+      this.configTooltipVisible = true
+    },
+    keepConfigTooltip(): void {
+      if (this.configTooltipTimer) {
+        clearTimeout(this.configTooltipTimer)
+        this.configTooltipTimer = null
+      }
+      this.configTooltipVisible = true
+    },
+    hideConfigTooltip(): void {
+      this.configTooltipTimer = setTimeout(() => {
+        this.configTooltipVisible = false
+      }, 100)
     }
   },
-  mounted() {
+  async mounted() {
     const { fetchAll } = useConfigurations()
     fetchAll()
     this.expandedPlatform = 1
+    try {
+      const res = await subscriptionService.getRemainingConfigurations()
+      this.canCreateConfig = res.data.remainingConfigurations > 0
+    } catch {
+      this.canCreateConfig = true
+    }
   }
 })
 </script>
@@ -412,8 +479,45 @@ export default defineComponent({
   margin-top: var(--spacing-xs);
 }
 
-.sidebar__add-config:hover {
+.sidebar__add-config:hover:not(:disabled) {
   background: var(--color-primary-light);
+}
+
+.sidebar__add-config--disabled {
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.sidebar__lock-icon {
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+.sidebar__add-config-wrapper {
+  position: relative;
+}
+
+.sidebar__limit-tooltip {
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 10px 14px;
+  border-radius: var(--border-radius, 8px);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  width: 240px;
+  text-align: left;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  margin: 0 0 0 -10px;
+  
+}
+
+.sidebar__limit-tooltip-link {
+  color: #60a5fa;
+  text-decoration: underline;
 }
 
 .sidebar__footer {

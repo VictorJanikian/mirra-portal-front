@@ -55,6 +55,7 @@ export interface Configuration {
   Username: string
   Password: string
   Schedulings: Scheduling[]
+  RemainingRunsPerWeek: number
 }
 
 export interface ConfigurationCreatePayload {
