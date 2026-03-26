@@ -10,7 +10,7 @@
     <div class="config-card__meta">
       <span class="config-card__user">{{ configuration.Username }}</span>
       <span class="config-card__badge">
-        {{ schedulingCount }} agendamento{{ schedulingCount !== 1 ? 's' : '' }}
+        {{ schedulingCount }} schedule{{ schedulingCount !== 1 ? 's' : '' }}
       </span>
     </div>
   </div>
@@ -31,7 +31,7 @@ export default defineComponent({
   computed: {
     platformLabel(): string {
       const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
-      return map[this.configuration.PlatformId] || 'Plataforma'
+      return map[this.configuration.PlatformId] || 'Platform'
     },
     schedulingCount(): number {
       return (this.configuration.Schedulings || []).length

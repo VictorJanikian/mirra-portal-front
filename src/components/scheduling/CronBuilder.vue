@@ -1,9 +1,9 @@
 <template>
   <div class="cron-builder">
     <div class="cron-builder__header">
-      <span class="cron-builder__title">Frequência de Publicação</span>
+      <span class="cron-builder__title">Publishing Frequency</span>
       <label class="cron-toggle">
-        <span>Modo Avançado</span>
+        <span>Advanced Mode</span>
         <span class="switch">
           <input type="checkbox" v-model="advancedMode" />
           <span class="slider" />
@@ -15,40 +15,40 @@
     <div v-if="!advancedMode" class="cron-builder__simple">
       <div class="cron-grid">
         <CronFieldSelect
-          label="Minutos"
+          label="Minutes"
           :model-value="fields.minutes"
           :options="minuteOptions"
           :multiple="false"
-          wildcard-label="Todo minuto"
+          wildcard-label="Every minute"
           @update:model-value="updateField('minutes', $event)"
         />
         <CronFieldSelect
-          label="Horas"
+          label="Hours"
           :model-value="fields.hours"
           :options="hourOptions"
-          wildcard-label="Todas"
+          wildcard-label="All"
           @update:model-value="updateField('hours', $event)"
         />
         <CronFieldSelect
-          label="Dias do mês"
+          label="Days of month"
           :model-value="fields.daysOfMonth"
           :options="dayOptions"
-          wildcard-label="Todos"
+          wildcard-label="All"
           :show-unselected="true"
           @update:model-value="updateField('daysOfMonth', $event)"
         />
         <CronFieldSelect
-          label="Meses"
+          label="Months"
           :model-value="fields.months"
           :options="monthOptions"
-          wildcard-label="Todos"
+          wildcard-label="All"
           @update:model-value="updateField('months', $event)"
         />
         <CronFieldSelect
-          label="Dias da semana"
+          label="Weekdays"
           :model-value="fields.weekdays"
           :options="weekdayOptions"
-          wildcard-label="Todos"
+          wildcard-label="All"
           :show-unselected="true"
           @update:model-value="updateField('weekdays', $event)"
         />
@@ -66,7 +66,7 @@
         @input="onRawInput"
       />
       <small class="cron-builder__help">
-        Use 5 campos: minuto / hora / dia / mês / dia-da-semana (use ? para "não selecionado")
+        Use 5 fields: minute / hour / day / month / weekday (use ? for "not selected")
       </small>
     </div>
 
@@ -128,19 +128,19 @@ export default defineComponent({
       return opts
     },
     monthOptions(): SelectOption[] {
-      const names: string[] = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+      const names: string[] = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December']
       return names.map((name, i) => ({ value: String(i + 1), label: name }))
     },
     weekdayOptions(): SelectOption[] {
       return [
-        { value: '0', label: 'Domingo' },
-        { value: '1', label: 'Segunda' },
-        { value: '2', label: 'Terça' },
-        { value: '3', label: 'Quarta' },
-        { value: '4', label: 'Quinta' },
-        { value: '5', label: 'Sexta' },
-        { value: '6', label: 'Sábado' }
+        { value: '0', label: 'Sunday' },
+        { value: '1', label: 'Monday' },
+        { value: '2', label: 'Tuesday' },
+        { value: '3', label: 'Wednesday' },
+        { value: '4', label: 'Thursday' },
+        { value: '5', label: 'Friday' },
+        { value: '6', label: 'Saturday' }
       ]
     }
   },

@@ -18,10 +18,10 @@
       </main>
     </div>
 
-    <!-- Modal: Nova Conexão -->
+    <!-- Modal: New Connection -->
     <BaseModal
       :show="showConfigModal"
-      title="Nova Conexão"
+      title="New Connection"
       @close="showConfigModal = false"
     >
       <ConfigurationForm
@@ -67,7 +67,7 @@ export default defineComponent({
       const { fetchAll } = useConfigurations()
       await fetchAll()
       const { success } = useToast()
-      success('Conexão criada com sucesso!')
+      success('Connection created successfully!')
     }
   }
 })

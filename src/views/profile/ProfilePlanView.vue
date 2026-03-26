@@ -8,7 +8,7 @@
     <!-- Error -->
     <div v-else-if="error" class="plan-view__error card">
       <p>{{ error }}</p>
-      <button class="btn btn--primary btn--small mt-md" @click="loadData">Tentar novamente</button>
+      <button class="btn btn--primary btn--small mt-md" @click="loadData">Try again</button>
     </div>
 
     <!-- Plans grid -->
@@ -20,7 +20,7 @@
         :class="{ 'plan-card--current': isCurrentPlan(plan.Id) }"
       >
         <!-- Badge -->
-        <div v-if="isCurrentPlan(plan.Id)" class="plan-card__badge">Plano atual</div>
+        <div v-if="isCurrentPlan(plan.Id)" class="plan-card__badge">Current plan</div>
 
         <!-- Header -->
         <div class="plan-card__header">

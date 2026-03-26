@@ -2,7 +2,7 @@
   <div class="scheduling-view">
     <div v-if="pageLoading" class="scheduling-view__loading">
       <span class="spinner" style="border-color: rgba(37,99,235,0.2); border-top-color: #2563eb;" />
-      <span>Carregando...</span>
+      <span>Loading...</span>
     </div>
 
     <div v-else class="scheduling-view__container card">
@@ -24,20 +24,20 @@
       />
 
       <div v-else class="scheduling-view__empty">
-        <p>Selecione um agendamento à esquerda ou crie um novo.</p>
+        <p>Select a schedule on the left or create a new one.</p>
       </div>
     </div>
 
     <!-- Delete confirmation -->
     <BaseModal
       :show="showDeleteModal"
-      title="Confirmar Exclusão"
+      title="Confirm Deletion"
       @close="showDeleteModal = false"
     >
-      <p>Deseja realmente remover este agendamento?</p>
+      <p>Are you sure you want to remove this schedule?</p>
       <template #footer>
-        <BaseButton variant="secondary" @click="showDeleteModal = false">Cancelar</BaseButton>
-        <BaseButton variant="danger" :loading="deleting" @click="confirmDelete">Remover</BaseButton>
+        <BaseButton variant="secondary" @click="showDeleteModal = false">Cancel</BaseButton>
+        <BaseButton variant="danger" :loading="deleting" @click="confirmDelete">Remove</BaseButton>
       </template>
     </BaseModal>
   </div>
@@ -151,19 +151,19 @@ export default defineComponent({
         if (this.currentSchedulingId) {
           const updated = await this.api.update(this.currentSchedulingId, payload)
           this.currentScheduling = { ...updated, Status: 0 }
-          success('Agendamento atualizado com sucesso!')
+          success('Schedule updated successfully!')
         } else {
           const created = await this.api.create(payload)
           this.currentScheduling = created
           this.currentSchedulingId = created.Id
-          success('Agendamento criado com sucesso!')
+          success('Schedule created successfully!')
         }
 
         this.schedulings = this.api.schedulings.value
         await this.refreshConfigurations()
       } catch (e: unknown) {
         const err = e as { response?: { data?: { message?: string } } }
-        error(err.response?.data?.message || 'Erro ao salvar agendamento')
+        error(err.response?.data?.message || 'Failed to save schedule')
       } finally {
         this.saving = false
       }
@@ -181,7 +181,7 @@ export default defineComponent({
       try {
         await this.api.remove(this.schedulingToDelete.Id)
         this.schedulings = this.api.schedulings.value
-        success('Agendamento removido com sucesso!')
+        success('Schedule removed successfully!')
 
         if (this.currentSchedulingId === this.schedulingToDelete.Id) {
           this.currentScheduling = null
@@ -194,7 +194,7 @@ export default defineComponent({
         await this.refreshConfigurations()
       } catch (e: unknown) {
         const err = e as { response?: { data?: { message?: string } } }
-        error(err.response?.data?.message || 'Erro ao remover agendamento')
+        error(err.response?.data?.message || 'Failed to remove schedule')
       } finally {
         this.deleting = false
       }

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(find /c/Users/vcjan/Desktop/projects/mirra-portal-front -type f \\\\\\(-path */locales/* -o -path */i18n/* -o -name *pt* -o -name *locale* -o -name *lang* \\\\\\))"
     ]
   }
 }

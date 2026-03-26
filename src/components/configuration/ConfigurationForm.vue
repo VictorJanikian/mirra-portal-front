@@ -2,39 +2,39 @@
   <form @submit.prevent="handleSubmit" class="config-form">
     <BaseSelect
       v-model="form.PlatformId"
-      label="Plataforma"
+      label="Platform"
       :options="platformOptions"
       :error="errors.PlatformId"
     />
 
     <BaseInput
       v-model="form.Url"
-      label="URL do site"
-      placeholder="https://meusite.com.br"
+      label="Website URL"
+      placeholder="https://mysite.com"
       :error="errors.Url"
     />
 
     <BaseInput
       v-model="form.Username"
-      label="Usuário"
-      placeholder="Nome de usuário"
+      label="Username"
+      placeholder="Username"
       :error="errors.Username"
     />
 
     <BaseInput
       v-model="form.Password"
-      label="Senha"
+      label="Password"
       type="password"
-      placeholder="Senha de acesso"
+      placeholder="Access password"
       :error="errors.Password"
     />
 
     <div class="config-form__actions">
       <BaseButton type="submit" :loading="loading">
-        Salvar
+        Save
       </BaseButton>
       <BaseButton variant="secondary" @click="$emit('cancel')">
-        Cancelar
+        Cancel
       </BaseButton>
     </div>
   </form>
@@ -81,9 +81,9 @@ export default defineComponent({
   methods: {
     validate(): boolean {
       this.errors = {}
-      if (!this.form.Url) this.errors.Url = 'Informe a URL'
-      if (!this.form.Username) this.errors.Username = 'Informe o usuário'
-      if (!this.form.Password) this.errors.Password = 'Informe a senha'
+      if (!this.form.Url) this.errors.Url = 'Please enter the URL'
+      if (!this.form.Username) this.errors.Username = 'Please enter the username'
+      if (!this.form.Password) this.errors.Password = 'Please enter the password'
       return Object.keys(this.errors).length === 0
     },
     async handleSubmit(): Promise<void> {
@@ -99,7 +99,7 @@ export default defineComponent({
       } catch (e: unknown) {
         const err = e as { response?: { data?: { message?: string } } }
         const { error } = useToast()
-        error(err.response?.data?.message || 'Erro ao criar conexão')
+        error(err.response?.data?.message || 'Failed to create connection')
       } finally {
         this.loading = false
       }

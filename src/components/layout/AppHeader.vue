@@ -18,7 +18,7 @@
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-bottom: 4px;">
         <path d="M8 2L14 8H10V14H6V8H2L8 2Z" fill="currentColor"/>
       </svg>
-      {{ isOnHighestPlan ? 'Plano máximo' : 'Upgrade' }}
+      {{ isOnHighestPlan ? 'Max plan' : 'Upgrade' }}
     </router-link>
 
     <div class="app-header__user" ref="userMenu">
@@ -37,21 +37,21 @@
               <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.2"/>
               <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
             </svg>
-            Perfil
+            Profile
           </router-link>
           <router-link to="/settings" class="app-header__dropdown-item" @click="menuOpen = false">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/>
               <path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M13.1 2.9l-1.4 1.4M4.3 11.7l-1.4 1.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
             </svg>
-            Preferências
+            Preferences
           </router-link>
           <div class="app-header__dropdown-divider" />
           <button class="app-header__dropdown-item app-header__dropdown-item--danger" @click="handleLogout">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Sair
+            Sign Out
           </button>
         </div>
       </transition>
@@ -73,7 +73,7 @@ export default defineComponent({
   computed: {
     userName(): string {
       const { state } = useAuth()
-      return state.user?.Name || 'Usuário'
+      return state.user?.Name || 'User'
     },
     initials(): string {
       const name = this.userName

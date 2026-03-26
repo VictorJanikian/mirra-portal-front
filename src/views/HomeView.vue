@@ -2,24 +2,24 @@
   <div class="home">
     <div class="home__header">
       <h1 class="home__title">Dashboard</h1>
-      <p class="home__subtitle">Bem-vindo à Mirra AI. Gerencie seus agendamentos de conteúdo automatizado.</p>
+      <p class="home__subtitle">Welcome to Mirra AI. Manage your automated content schedules.</p>
     </div>
 
     <div v-if="hasSuspendedNopayment" class="home__banner home__banner--warning">
-      Você tem agendamentos suspensos por pendências no pagamento.
-      <a :href="stripePortalUrl" target="_blank" rel="noopener" class="home__banner-link">Regularize seu pagamento</a>
-      ou limite o número de postagens semanais.
+      You have schedules suspended due to payment issues.
+      <a :href="stripePortalUrl" target="_blank" rel="noopener" class="home__banner-link">Resolve your payment</a>
+      or limit the number of weekly posts.
     </div>
 
     <div v-if="hasSuspendedDowngrade" class="home__banner home__banner--warning">
-      Você tem agendamentos suspensos por downgrade do plano.
-      <router-link :to="{ name: 'ProfilePlan' }" class="home__banner-link">Atualize seu plano</router-link>
-      ou diminua o número de postagens semanais.
+      You have schedules suspended due to a plan downgrade.
+      <router-link :to="{ name: 'ProfilePlan' }" class="home__banner-link">Upgrade your plan</router-link>
+      or reduce the number of weekly posts.
     </div>
 
     <div v-if="loading" class="home__loading">
       <span class="spinner" style="border-color: rgba(37,99,235,0.2); border-top-color: #2563eb;" />
-      <span>Carregando...</span>
+      <span>Loading...</span>
     </div>
 
     <template v-else>
@@ -37,7 +37,7 @@
           </div>
           <div class="stat-card__info">
             <span class="stat-card__value">{{ totalConfigs }}</span>
-            <span class="stat-card__label">Conexões</span>
+            <span class="stat-card__label">Connections</span>
           </div>
         </button>
 
@@ -54,7 +54,7 @@
           </div>
           <div class="stat-card__info">
             <span class="stat-card__value">{{ totalSchedulings }}</span>
-            <span class="stat-card__label">Agendamentos Ativos</span>
+            <span class="stat-card__label">Active Schedules</span>
           </div>
         </button>
       </div>
@@ -66,8 +66,8 @@
             <path d="M12 8v4M12 16h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <h3>Nenhuma conexão encontrada</h3>
-        <p>Comece conectando uma plataforma para criar agendamentos de conteúdo.</p>
+        <h3>No connections found</h3>
+        <p>Start by connecting a platform to create content schedules.</p>
         <div class="home__btn-wrapper">
           <button
             class="home__empty-btn"
@@ -76,21 +76,21 @@
             @click="canCreateConfig && openNewConfig(1)"
           >
             <SvgIcon v-if="!canCreateConfig" name="lock" :size="12" class="home__lock-icon" />
-            Conectar site ou perfil
+            Connect site or profile
           </button>
           <div v-if="!canCreateConfig" class="home__limit-tooltip">
-            Você atingiu o número máximo de conexões disponíveis no seu plano.
-            <router-link :to="{ name: 'ProfilePlan' }" class="home__limit-tooltip-link">Clique aqui</router-link>
-            para atualizar o plano.
+            You have reached the maximum number of connections available on your plan.
+            <router-link :to="{ name: 'ProfilePlan' }" class="home__limit-tooltip-link">Click here</router-link>
+            to upgrade your plan.
           </div>
         </div>
       </div>
 
-      <!-- Tab: Conexões -->
+      <!-- Tab: Connections -->
       <transition name="fade" mode="out-in">
         <div v-if="activeTab === 'configurations' && totalConfigs > 0" key="configurations">
           <div class="home__section-header">
-            <h2 class="home__section-title">Suas Conexões</h2>
+            <h2 class="home__section-title">Your Connections</h2>
             <div class="home__btn-wrapper">
               <button
                 class="home__new-config-btn"
@@ -99,12 +99,12 @@
                 @click="canCreateConfig && openNewConfig(1)"
               >
                 <SvgIcon v-if="!canCreateConfig" name="lock" :size="12" class="home__lock-icon" />
-                {{ canCreateConfig ? '+ Nova Conexão' : 'Nova Conexão' }}
+                {{ canCreateConfig ? '+ New Connection' : 'New Connection' }}
               </button>
               <div v-if="!canCreateConfig" class="home__limit-tooltip">
-                Você atingiu o número máximo de conexões disponíveis no seu plano.
-                <router-link :to="{ name: 'ProfilePlan' }" class="home__limit-tooltip-link">Clique aqui</router-link>
-                para atualizar o plano.
+                You have reached the maximum number of connections available on your plan.
+                <router-link :to="{ name: 'ProfilePlan' }" class="home__limit-tooltip-link">Click here</router-link>
+                to upgrade your plan.
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@
                   <span class="config-item__user">{{ config.Username }}</span>
                 </div>
                 <span class="config-item__badge">
-                  {{ (config.Schedulings || []).length }} agendamento{{ (config.Schedulings || []).length !== 1 ? 's' : '' }}
+                  {{ (config.Schedulings || []).length }} schedule{{ (config.Schedulings || []).length !== 1 ? 's' : '' }}
                 </span>
                 <svg
                   class="config-item__expand"
@@ -142,7 +142,7 @@
               <transition name="expand">
                 <div v-if="isExpanded(config.Id)" class="config-item__body">
                   <div v-if="(config.Schedulings || []).length === 0" class="config-item__empty">
-                    Nenhum agendamento nesta conexão.
+                    No schedules in this connection.
                   </div>
 
                   <router-link
@@ -153,7 +153,7 @@
                   >
                     <div class="scheduling-row__info">
                       <span class="scheduling-row__title">
-                        {{ scheduling.Parameters?.ThemeTitle || `Agendamento #${scheduling.Id}` }}
+                        {{ scheduling.Parameters?.ThemeTitle || `Schedule #${scheduling.Id}` }}
                       </span>
                       <span v-if="scheduling.Parameters?.Description" class="scheduling-row__desc">
                         {{ scheduling.Parameters.Description }}
@@ -164,7 +164,7 @@
                         class="scheduling-row__status"
                         :class="scheduling.Status === 0 ? 'scheduling-row__status--active' : 'scheduling-row__status--inactive'"
                       >
-                        {{ scheduling.Status === 0 ? 'Ativo' : 'Inativo' }}
+                        {{ scheduling.Status === 0 ? 'Active' : 'Inactive' }}
                       </span>
                       <span v-if="scheduling.Interval" class="scheduling-row__interval">
                         {{ scheduling.Interval }}
@@ -181,16 +181,16 @@
                       :to="`/configurations/${config.Id}/schedulings/new`"
                       class="config-item__add-scheduling"
                     >
-                      + Novo Agendamento
+                      + New Schedule
                     </router-link>
                     <span v-else class="config-item__add-scheduling config-item__add-scheduling--disabled">
                       <SvgIcon name="lock" :size="12" class="home__lock-icon" />
-                      Novo Agendamento
+                      New Schedule
                     </span>
                     <div v-if="config.RemainingRunsPerWeek <= 0" class="home__limit-tooltip home__limit-tooltip--left">
-                      Você atingiu o número máximo de posts semanais para essa conexão.
-                      <router-link :to="{ name: 'ProfilePlan' }" class="home__limit-tooltip-link">Clique aqui</router-link>
-                      para atualizar seu plano.
+                      You have reached the maximum number of weekly posts for this connection.
+                      <router-link :to="{ name: 'ProfilePlan' }" class="home__limit-tooltip-link">Click here</router-link>
+                      to upgrade your plan.
                     </div>
                   </div>
                 </div>
@@ -199,10 +199,10 @@
           </div>
         </div>
 
-        <!-- Tab: Agendamentos -->
+        <!-- Tab: Schedules -->
         <div v-else-if="activeTab === 'schedulings' && totalConfigs > 0" key="schedulings">
           <div class="home__section-header">
-            <h2 class="home__section-title">Todos os Agendamentos</h2>
+            <h2 class="home__section-title">All Schedules</h2>
           </div>
 
           <div v-if="allSchedulings.length === 0" class="home__empty-tab">
@@ -210,8 +210,8 @@
               <rect x="3" y="4" width="18" height="18" rx="2" stroke="#cbd5e1" stroke-width="1.5"/>
               <path d="M16 2v4M8 2v4M3 10h18" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            <p>Nenhum agendamento encontrado.</p>
-            <span>Crie um agendamento dentro de uma conexão.</span>
+            <p>No schedules found.</p>
+            <span>Create a schedule within a connection.</span>
           </div>
 
           <div v-else class="home__schedulings-list">
@@ -223,7 +223,7 @@
             >
               <div class="scheduling-card__left">
                 <span class="scheduling-card__title">
-                  {{ item.scheduling.Parameters?.ThemeTitle || `Agendamento #${item.scheduling.Id}` }}
+                  {{ item.scheduling.Parameters?.ThemeTitle || `Schedule #${item.scheduling.Id}` }}
                 </span>
                 <span v-if="item.scheduling.Parameters?.Description" class="scheduling-card__desc">
                   {{ item.scheduling.Parameters.Description }}
@@ -243,7 +243,7 @@
                     class="scheduling-card__tag"
                     :class="item.scheduling.Status === 0 ? 'scheduling-card__tag--status-active' : 'scheduling-card__tag--status-inactive'"
                   >
-                    {{ item.scheduling.Status === 0 ? 'Ativo' : 'Inativo' }}
+                    {{ item.scheduling.Status === 0 ? 'Active' : 'Inactive' }}
                   </span>
                 </div>
               </div>
@@ -336,10 +336,10 @@ export default defineComponent({
   methods: {
     platformLabel(platformId: number): string {
       const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
-      return map[platformId] || 'Plataforma'
+      return map[platformId] || 'Platform'
     },
     formatName(name: string): string {
-      if (!name) return 'Sem nome'
+      if (!name) return 'No name'
       return name;
     },
     isExpanded(id: number): boolean {

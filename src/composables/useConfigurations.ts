@@ -15,7 +15,7 @@ export function useConfigurations() {
       configurations.value = data
     } catch (e: unknown) {
       const err = e as { response?: { data?: { message?: string } } }
-      error.value = err.response?.data?.message || 'Erro ao carregar conexões'
+      error.value = err.response?.data?.message || 'Failed to load connections'
     } finally {
       loading.value = false
     }

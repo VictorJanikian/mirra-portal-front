@@ -1,49 +1,45 @@
 const WEEKDAY_MAP: Record<number, string> = {
-  0: 'Domingo', 1: 'Segunda', 2: 'Terça', 3: 'Quarta',
-  4: 'Quinta', 5: 'Sexta', 6: 'Sábado'
+  0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday',
+  4: 'Thursday', 5: 'Friday', 6: 'Saturday'
 }
 
 const MONTH_MAP: Record<number, string> = {
-  1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
-  5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
-  9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+  1: 'January', 2: 'February', 3: 'March', 4: 'April',
+  5: 'May', 6: 'June', 7: 'July', 8: 'August',
+  9: 'September', 10: 'October', 11: 'November', 12: 'December'
 }
 
 function formatList(values: string, map: Record<number, string>): string {
   const items = values.split(',').map(v => map[Number(v)] || v)
   if (items.length === 1) return items[0]
-  if (items.length === 2) return `${items[0]} e ${items[1]}`
-  return `${items.slice(0, -1).join(', ')} e ${items[items.length - 1]}`
-}
-
-function isSundayOrSaturday(day: string): boolean {
-  return day === '0' || day === '6'
+  if (items.length === 2) return `${items[0]} and ${items[1]}`
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
 }
 
 export function cronToHuman(expr: string): string {
   if (!expr || !/^([*?0-9,/-]+ ){4}[*?0-9,/-]+$/.test(expr.trim())) {
-    return 'Expressão cron inválida'
+    return 'Invalid cron expression'
   }
 
   const [min, hour, day, month, weekday] = expr.trim().split(' ')
 
   // Common presets
-  if (expr.trim() === '* * * * *') return 'A cada minuto'
-  if (expr.trim() === '0 * * * *') return 'A cada hora'
-  if (expr.trim() === '0 0 * * *') return 'Todos os dias à meia-noite'
-  if (expr.trim() === '0 12 * * *') return 'Todos os dias ao meio-dia'
+  if (expr.trim() === '* * * * *') return 'Every minute'
+  if (expr.trim() === '0 * * * *') return 'Every hour'
+  if (expr.trim() === '0 0 * * *') return 'Every day at midnight'
+  if (expr.trim() === '0 12 * * *') return 'Every day at noon'
 
   const parts: string[] = []
 
   // Minutes
   if (min === '*') {
-    parts.push('A cada minuto')
+    parts.push('Every minute')
   } else if (min === '0') {
-    parts.push('No início da hora')
+    parts.push('At the start of the hour')
   } else if (min.includes(',')) {
-    parts.push(`Nos minutos ${min.split(',').join(', ')}`)
+    parts.push(`At minutes ${min.split(',').join(', ')}`)
   } else {
-    parts.push(`No minuto ${min}`)
+    parts.push(`At minute ${min}`)
   }
 
   // Hours
@@ -51,12 +47,12 @@ export function cronToHuman(expr: string): string {
     if (hour.includes(',')) {
       const hours = hour.split(',')
       if (hours.length <= 3) {
-        parts.push(`às ${hours.map(h => `${h}h`).join(', ')}`)
+        parts.push(`at ${hours.map(h => `${h}h`).join(', ')}`)
       } else {
-        parts.push(`em ${hours.length} horários específicos`)
+        parts.push(`at ${hours.length} specific times`)
       }
     } else {
-      parts.push(`às ${hour}h`)
+      parts.push(`at ${hour}h`)
     }
   }
 
@@ -65,12 +61,12 @@ export function cronToHuman(expr: string): string {
     if (day.includes(',')) {
       const days = day.split(',')
       if (days.length <= 5) {
-        parts.push(`nos dias ${days.join(', ')}`)
+        parts.push(`on days ${days.join(', ')}`)
       } else {
-        parts.push(`em ${days.length} dias específicos do mês`)
+        parts.push(`on ${days.length} specific days of the month`)
       }
     } else {
-      parts.push(`no dia ${day}`)
+      parts.push(`on day ${day}`)
     }
   }
 
@@ -79,12 +75,12 @@ export function cronToHuman(expr: string): string {
     if (month.includes(',')) {
       const months = month.split(',')
       if (months.length <= 6) {
-        parts.push(`em ${formatList(month, MONTH_MAP)}`)
+        parts.push(`in ${formatList(month, MONTH_MAP)}`)
       } else {
-        parts.push(`em ${months.length} meses específicos`)
+        parts.push(`in ${months.length} specific months`)
       }
     } else {
-      parts.push(`em ${MONTH_MAP[Number(month)] || month}`)
+      parts.push(`in ${MONTH_MAP[Number(month)] || month}`)
     }
   }
 
@@ -93,14 +89,12 @@ export function cronToHuman(expr: string): string {
     if (weekday.includes(',')) {
       const days = weekday.split(',')
       if (days.length <= 4) {
-        const prep = isSundayOrSaturday(days[0]) ? 'aos' : 'nas'
-        parts.push(`${prep} ${formatList(weekday, WEEKDAY_MAP)}`)
+        parts.push(`on ${formatList(weekday, WEEKDAY_MAP)}`)
       } else {
-        parts.push('em vários dias da semana')
+        parts.push('on multiple weekdays')
       }
     } else {
-      const prep = isSundayOrSaturday(weekday) ? 'aos' : 'nas'
-      parts.push(`${prep} ${WEEKDAY_MAP[Number(weekday)] || weekday}`)
+      parts.push(`on ${WEEKDAY_MAP[Number(weekday)] || weekday}`)
     }
   }
 

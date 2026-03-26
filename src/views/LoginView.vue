@@ -1,34 +1,34 @@
 <template>
   <AuthCard>
-    <h2 class="auth-title">Bem-vindo de volta</h2>
-    <p class="auth-subtitle">Entre na sua conta para continuar</p>
+    <h2 class="auth-title">Welcome back</h2>
+    <p class="auth-subtitle">Sign in to your account to continue</p>
 
     <form @submit.prevent="handleLogin" class="auth-form">
       <BaseInput
         v-model="email"
-        label="E-mail"
+        label="Email"
         type="email"
-        placeholder="seu@email.com"
+        placeholder="you@email.com"
         :error="errors.email"
       />
 
       <BaseInput
         v-model="password"
-        label="Senha"
+        label="Password"
         type="password"
-        placeholder="Sua senha"
+        placeholder="Your password"
         :error="errors.password"
       />
 
       <div v-if="serverError" class="auth-error">{{ serverError }}</div>
 
       <BaseButton type="submit" :loading="loading" block>
-        Entrar
+        Sign In
       </BaseButton>
     </form>
 
     <p class="auth-link">
-      Não tem conta? <router-link to="/register">Cadastre-se</router-link>
+      Don't have an account? <router-link to="/register">Sign Up</router-link>
     </p>
   </AuthCard>
 </template>
@@ -61,9 +61,9 @@ export default defineComponent({
   methods: {
     validate(): boolean {
       this.errors = { email: '', password: '' }
-      if (!this.email) this.errors.email = 'Informe seu e-mail'
-      else if (!isValidEmail(this.email)) this.errors.email = 'E-mail inválido'
-      if (!this.password) this.errors.password = 'Informe sua senha'
+      if (!this.email) this.errors.email = 'Please enter your email'
+      else if (!isValidEmail(this.email)) this.errors.email = 'Invalid email'
+      if (!this.password) this.errors.password = 'Please enter your password'
       return !this.errors.email && !this.errors.password
     },
     async handleLogin(): Promise<void> {
@@ -75,7 +75,7 @@ export default defineComponent({
         await login(this.email, this.password)
       } catch (e: unknown) {
         const err = e as { response?: { data?: { message?: string } | string } }
-        this.serverError = (err.response?.data as { message?: string })?.message || err.response?.data as string || 'Erro ao fazer login. Verifique suas credenciais.'
+        this.serverError = (err.response?.data as { message?: string })?.message || err.response?.data as string || 'Login failed. Please check your credentials.'
       } finally {
         this.loading = false
       }

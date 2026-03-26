@@ -7,13 +7,13 @@
         </svg>
         Dashboard
       </router-link>
-      <h1 class="schedulings-view__title">Agendamentos Ativos</h1>
-      <p class="schedulings-view__subtitle">Todos os agendamentos de todas as suas conexões.</p>
+      <h1 class="schedulings-view__title">Active Schedules</h1>
+      <p class="schedulings-view__subtitle">All schedules from all your connections.</p>
     </div>
 
     <div v-if="loading" class="schedulings-view__loading">
       <span class="spinner" style="border-color: rgba(37,99,235,0.2); border-top-color: #2563eb;" />
-      <span>Carregando...</span>
+      <span>Loading...</span>
     </div>
 
     <div v-else-if="allSchedulings.length === 0" class="schedulings-view__empty">
@@ -23,8 +23,8 @@
           <path d="M16 2v4M8 2v4M3 10h18" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <h3>Nenhum agendamento encontrado</h3>
-      <p>Crie um agendamento dentro de uma conexão existente.</p>
+      <h3>No schedules found</h3>
+      <p>Create a schedule within an existing connection.</p>
     </div>
 
     <div v-else class="schedulings-view__list">
@@ -37,7 +37,7 @@
         <div class="scheduling-card__left">
           <div class="scheduling-card__title-row">
             <span class="scheduling-card__title">
-              {{ item.scheduling.Parameters?.ThemeTitle || `Agendamento #${item.scheduling.Id}` }}
+              {{ item.scheduling.Parameters?.ThemeTitle || `Schedule #${item.scheduling.Id}` }}
             </span>
           </div>
           <span v-if="item.scheduling.Parameters?.Description" class="scheduling-card__desc">
@@ -109,10 +109,10 @@ export default defineComponent({
   methods: {
     platformLabel(platformId: number): string {
       const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
-      return map[platformId] || 'Plataforma'
+      return map[platformId] || 'Platform'
     },
     formatUrl(url: string): string {
-      if (!url) return 'Sem URL'
+      if (!url) return 'No URL'
       return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
     }
   }

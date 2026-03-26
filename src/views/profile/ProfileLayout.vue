@@ -1,28 +1,28 @@
 <template>
   <div class="profile-layout">
     <div class="profile-layout__header">
-      <h1 class="profile-layout__title">Perfil</h1>
+      <h1 class="profile-layout__title">Profile</h1>
       <nav class="profile-layout__nav">
         <router-link
           to="/profile/data"
           class="profile-layout__tab"
           active-class="profile-layout__tab--active"
         >
-          Meus dados
+          My Data
         </router-link>
         <router-link
           to="/profile/plan"
           class="profile-layout__tab"
           active-class="profile-layout__tab--active"
         >
-          Meu plano
+          My Plan
         </router-link>
         <router-link
           to="/profile/payments"
           class="profile-layout__tab"
           active-class="profile-layout__tab--active"
         >
-          Pagamentos
+          Payments
         </router-link>
       </nav>
     </div>

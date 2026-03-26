@@ -1,7 +1,7 @@
 <template>
   <div class="scheduling-form fade-in">
     <div class="scheduling-form__title-row">
-      <h2 class="scheduling-form__title">{{ isEditing ? 'Editar Agendamento' : 'Novo Agendamento' }}</h2>
+      <h2 class="scheduling-form__title">{{ isEditing ? 'Edit Schedule' : 'New Schedule' }}</h2>
       <span
         v-if="isEditing && scheduling && scheduling.Status !== 2"
         class="scheduling-form__status"
@@ -12,98 +12,98 @@
     </div>
 
     <div v-if="isEditing && scheduling && scheduling.Status === 2" class="scheduling-form__banner">
-      Suspenso por downgrade do plano.
+      Suspended due to plan downgrade.
       <br>
-      <router-link :to="{ name: 'ProfilePlan' }" class="scheduling-form__banner-link">Atualize seu plano</router-link>
-      ou diminua o número de postagens semanais dessa conexão.
+      <router-link :to="{ name: 'ProfilePlan' }" class="scheduling-form__banner-link">Upgrade your plan</router-link>
+      or reduce the number of weekly posts for this connection.
     </div>
 
     <form @submit.prevent="handleSubmit" class="scheduling-form__fields">
       <BaseInput
         v-model="formData.ThemeTitle"
-        label="Título do Tema *"
-        tooltip="O tema geral do blog. Define o assunto principal sobre o qual a IA irá gerar conteúdo."
-        placeholder="Ex: Marketing Digital para Pequenas Empresas"
+        label="Theme Title *"
+        tooltip="The general blog theme. Defines the main subject the AI will generate content about."
+        placeholder="E.g.: Digital Marketing for Small Businesses"
       />
 
       <BaseTextarea
         v-model="formData.Description"
-        label="Descrição"
-        tooltip="O guia editorial principal. Pode representar um recorte específico do tema ou o ângulo editorial a ser seguido. É a principal bússola para a geração de conteúdo."
-        placeholder="Descreva o foco editorial do conteúdo..."
+        label="Description"
+        tooltip="The main editorial guide. It can represent a specific angle of the theme or the editorial direction to follow. It is the main compass for content generation."
+        placeholder="Describe the editorial focus of the content..."
         :rows="3"
       />
 
       <BaseInput
         v-model="formData.SearchIntent"
-        label="Intenção de Busca"
-        tooltip="O que o usuário espera encontrar ao pesquisar sobre o tema. Ajuda a adequar o conteúdo às expectativas de quem busca informações no Google."
-        placeholder="Ex: Como aumentar vendas online"
+        label="Search Intent"
+        tooltip="What the user expects to find when searching for the topic. Helps tailor the content to the expectations of those looking for information on Google."
+        placeholder="E.g.: How to increase online sales"
       />
 
       <BaseInput
         v-model="formData.Keywords"
-        label="Palavras-chave"
-        tooltip="Termos principais para SEO. A IA usará essas palavras e suas variações semânticas para otimizar o conteúdo para mecanismos de busca."
-        placeholder="Ex: marketing digital, vendas online, SEO"
+        label="Keywords"
+        tooltip="Main SEO terms. The AI will use these words and their semantic variations to optimize the content for search engines."
+        placeholder="E.g.: digital marketing, online sales, SEO"
       />
 
       <BaseInput
         v-model="formData.TargetAudience"
-        label="Público-alvo"
-        tooltip="Para quem o conteúdo é destinado. Define a linguagem, profundidade e abordagem do texto gerado."
-        placeholder="Ex: Empreendedores iniciantes"
+        label="Target Audience"
+        tooltip="Who the content is intended for. Defines the language, depth, and approach of the generated text."
+        placeholder="E.g.: Beginner entrepreneurs"
       />
 
       <BaseInput
         v-model="formData.Style"
-        label="Estilo"
-        tooltip="O tom e estilo de linguagem do texto. Exemplos: formal, irreverente, técnico, acadêmico, descontraído, etc."
-        placeholder="Ex: Informativo e acessível"
+        label="Style"
+        tooltip="The tone and language style of the text. Examples: formal, irreverent, technical, academic, casual, etc."
+        placeholder="E.g.: Informative and accessible"
       />
 
       <BaseInput
         v-model="formData.Goal"
-        label="Objetivo"
-        tooltip="O que você deseja alcançar com o conteúdo. Exemplos: converter visitantes em assinantes, educar o leitor, gerar engajamento, etc."
-        placeholder="Ex: Gerar leads qualificados"
+        label="Goal"
+        tooltip="What you want to achieve with the content. Examples: convert visitors into subscribers, educate the reader, generate engagement, etc."
+        placeholder="E.g.: Generate qualified leads"
       />
 
       <BaseInput
         v-model="formData.CTA"
         label="CTA (Call to Action)"
-        tooltip="Chamada para ação opcional. Se informado, será integrado naturalmente ao final do texto como consequência lógica do argumento, sem linguagem promocional excessiva."
-        placeholder="Ex: Assine nossa newsletter"
+        tooltip="Optional call to action. If provided, it will be naturally integrated at the end of the text as a logical consequence of the argument, without excessive promotional language."
+        placeholder="E.g.: Subscribe to our newsletter"
       />
 
       <BaseInput
         v-model="formData.ApproximatedSize"
-        label="Tamanho Aproximado"
-        tooltip="Quantidade aproximada de palavras do texto gerado. A IA tentará se aproximar desse número, aceitando pequenas variações naturais."
-        placeholder="Ex: 1500"
+        label="Approximate Size"
+        tooltip="Approximate number of words in the generated text. The AI will try to get close to this number, accepting small natural variations."
+        placeholder="E.g.: 1500"
       />
 
       <BaseTextarea
         v-model="formData.AdditionalInfo"
-        label="Informações Adicionais"
-        tooltip="Contexto extra, definições conceituais ou informações específicas que a IA deve considerar ao gerar o conteúdo."
-        placeholder="Informações extras para orientar a geração..."
+        label="Additional Information"
+        tooltip="Extra context, conceptual definitions, or specific information the AI should consider when generating content."
+        placeholder="Extra information to guide content generation..."
         :rows="3"
       />
 
       <BaseTextarea
         v-model="formData.SEOAdditionalInformation"
         label="SEO"
-        tooltip="Instruções específicas de SEO, como meta descriptions otimizadas, alt texts para imagens, ou outras diretrizes de otimização para buscadores."
-        placeholder="Instruções adicionais de SEO..."
+        tooltip="Specific SEO instructions, such as optimized meta descriptions, image alt texts, or other search engine optimization guidelines."
+        placeholder="Additional SEO instructions..."
         :rows="3"
       />
 
       <BaseInput
         v-model="formData.Language"
-        label="Idioma"
-        tooltip="O idioma em que o conteúdo será gerado. Use códigos como pt-BR (português brasileiro) ou en-US (inglês americano)."
-        placeholder="Ex: pt-BR"
+        label="Language"
+        tooltip="The language in which the content will be generated. Use codes like en-US (American English) or pt-BR (Brazilian Portuguese)."
+        placeholder="E.g.: en-US"
       />
 
       <CronBuilder
@@ -112,7 +112,7 @@
 
       <div class="scheduling-form__actions">
         <BaseButton type="submit" :loading="loading">
-          Salvar
+          Save
         </BaseButton>
       </div>
     </form>
@@ -150,7 +150,7 @@ export default defineComponent({
         ApproximatedSize: params.ApproximatedSize || '',
         AdditionalInfo: params.AdditionalInfo || '',
         SEOAdditionalInformation: params.SEOAdditionalInformation || '',
-        Language: params.Language || 'pt-BR'
+        Language: params.Language || 'en-US'
       } as SchedulingParameters,
       cronExpression: this.scheduling?.Interval || '* * * * *'
     }
@@ -161,10 +161,10 @@ export default defineComponent({
     },
     statusLabel(): string {
       const status = this.scheduling?.Status
-      if (status === 0) return 'Ativo'
-      if (status === 1) return 'Inativo por falta de pagamento'
-      if (status === 3) return 'Cancelado'
-      return 'Inativo'
+      if (status === 0) return 'Active'
+      if (status === 1) return 'Inactive due to missing payment'
+      if (status === 3) return 'Canceled'
+      return 'Inactive'
     }
   },
   methods: {
@@ -192,7 +192,7 @@ export default defineComponent({
             ApproximatedSize: params.ApproximatedSize || '',
             AdditionalInfo: params.AdditionalInfo || '',
             SEOAdditionalInformation: params.SEOAdditionalInformation || '',
-            Language: params.Language || 'pt-BR'
+            Language: params.Language || 'en-US'
           } as SchedulingParameters
           this.cronExpression = val.Interval || '* * * * *'
         } else {
@@ -208,7 +208,7 @@ export default defineComponent({
             ApproximatedSize: '',
             AdditionalInfo: '',
             SEOAdditionalInformation: '',
-            Language: 'pt-BR'
+            Language: 'en-US'
           } as SchedulingParameters
           this.cronExpression = '* * * * *'
         }

@@ -1,7 +1,7 @@
 <template>
   <div class="scheduling-list">
     <div class="scheduling-list__header">
-      <h2>Agendamentos</h2>
+      <h2>Schedules</h2>
     </div>
 
     <ul class="scheduling-list__items">
@@ -13,7 +13,7 @@
         <button
           class="scheduling-item-delete"
           @click.stop="$emit('delete', scheduling)"
-          title="Remover agendamento"
+          title="Remove schedule"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M2 10L10 2M2 2l8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -25,13 +25,13 @@
           @click="$emit('select', scheduling)"
         >
           <span class="scheduling-item__label">
-            {{ scheduling.Parameters?.ThemeTitle || `Agendamento #${scheduling.Id}` }}
+            {{ scheduling.Parameters?.ThemeTitle || `Schedule #${scheduling.Id}` }}
           </span>
           <span
             class="scheduling-item__status"
             :class="scheduling.Status === 0 ? 'scheduling-item__status--active' : 'scheduling-item__status--inactive'"
           >
-            {{ scheduling.Status === 0 ? 'Ativo' : 'Inativo' }}
+            {{ scheduling.Status === 0 ? 'Active' : 'Inactive' }}
           </span>
         </div>
       </li>
@@ -42,16 +42,16 @@
           class="scheduling-item scheduling-item--add"
           @click="$emit('create')"
         >
-          + Criar novo
+          + Create new
         </div>
         <div v-else class="scheduling-item scheduling-item--add scheduling-item--disabled">
           <SvgIcon name="lock" :size="12" class="scheduling-list__lock-icon" />
-          Criar novo
+          Create new
         </div>
         <div v-if="!canCreate" class="scheduling-list__limit-tooltip">
-          Você atingiu o número máximo de posts semanais para essa conexão.
-          <router-link :to="{ name: 'ProfilePlan' }" class="scheduling-list__limit-tooltip-link">Clique aqui</router-link>
-          para atualizar seu plano.
+          You have reached the maximum number of weekly posts for this connection.
+          <router-link :to="{ name: 'ProfilePlan' }" class="scheduling-list__limit-tooltip-link">Click here</router-link>
+          to upgrade your plan.
         </div>
       </li>
     </ul>

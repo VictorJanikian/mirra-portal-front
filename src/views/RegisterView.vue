@@ -1,41 +1,41 @@
 <template>
   <AuthCard>
-    <h2 class="auth-title">Crie sua conta</h2>
-    <p class="auth-subtitle">Comece a usar a Mirra AI agora</p>
+    <h2 class="auth-title">Create your account</h2>
+    <p class="auth-subtitle">Start using Mirra AI now</p>
 
     <form @submit.prevent="handleRegister" class="auth-form">
       <BaseInput
         v-model="name"
-        label="Nome"
-        placeholder="Seu nome"
+        label="Name"
+        placeholder="Your name"
         :error="errors.name"
       />
 
       <BaseInput
         v-model="email"
-        label="E-mail"
+        label="Email"
         type="email"
-        placeholder="seu@email.com"
+        placeholder="you@email.com"
         :error="errors.email"
       />
 
       <BaseInput
         v-model="password"
-        label="Senha"
+        label="Password"
         type="password"
-        placeholder="Mínimo 6 caracteres"
+        placeholder="Minimum 6 characters"
         :error="errors.password"
       />
 
       <div v-if="serverError" class="auth-error">{{ serverError }}</div>
 
       <BaseButton type="submit" :loading="loading" block>
-        Registrar
+        Sign Up
       </BaseButton>
     </form>
 
     <p class="auth-link">
-      Já tem conta? <router-link to="/login">Entrar</router-link>
+      Already have an account? <router-link to="/login">Sign In</router-link>
     </p>
   </AuthCard>
 </template>
@@ -70,11 +70,11 @@ export default defineComponent({
   methods: {
     validate(): boolean {
       this.errors = { name: '', email: '', password: '' }
-      if (!this.name) this.errors.name = 'Informe seu nome'
-      if (!this.email) this.errors.email = 'Informe seu e-mail'
-      else if (!isValidEmail(this.email)) this.errors.email = 'E-mail inválido'
-      if (!this.password) this.errors.password = 'Informe uma senha'
-      else if (!isValidPassword(this.password)) this.errors.password = 'A senha deve ter no mínimo 6 caracteres'
+      if (!this.name) this.errors.name = 'Please enter your name'
+      if (!this.email) this.errors.email = 'Please enter your email'
+      else if (!isValidEmail(this.email)) this.errors.email = 'Invalid email'
+      if (!this.password) this.errors.password = 'Please enter a password'
+      else if (!isValidPassword(this.password)) this.errors.password = 'Password must be at least 6 characters'
       return !this.errors.name && !this.errors.email && !this.errors.password
     },
     async handleRegister(): Promise<void> {
@@ -86,7 +86,7 @@ export default defineComponent({
         await register(this.name, this.email, this.password)
       } catch (e: unknown) {
         const err = e as { response?: { data?: { Message?: string } | string } }
-        this.serverError = (err.response?.data as { Message?: string })?.Message || err.response?.data as string || 'Erro ao criar conta. Tente novamente.'
+        this.serverError = (err.response?.data as { Message?: string })?.Message || err.response?.data as string || 'Failed to create account. Please try again.'
       } finally {
         this.loading = false
       }

@@ -1,9 +1,9 @@
 <template>
   <div class="payments-view">
     <div class="card">
-      <h2 class="payments-view__title">Pagamentos</h2>
+      <h2 class="payments-view__title">Payments</h2>
       <p class="payments-view__description">
-        Gerencie suas faturas, métodos de pagamento e histórico de pagamentos no portal de pagamentos.
+        Manage your invoices, payment methods, and payment history in the payment portal.
       </p>
       <button
         class="btn btn--primary"
@@ -11,7 +11,7 @@
         @click="openPaymentPortal"
       >
         <SvgIcon name="external-link" />
-        Gerenciar pagamentos
+        Manage payments
       </button>
     </div>
   </div>

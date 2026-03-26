@@ -38,7 +38,7 @@ export default defineComponent({
     label: { type: String, required: true },
     modelValue: { type: Array as PropType<string[]>, default: () => ['*'] },
     options: { type: Array as PropType<SelectOption[]>, required: true },
-    wildcardLabel: { type: String, default: 'Todos' },
+    wildcardLabel: { type: String, default: 'All' },
     multiple: { type: Boolean, default: true },
     showUnselected: { type: Boolean, default: false }
   },

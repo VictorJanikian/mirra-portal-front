@@ -1,13 +1,13 @@
 <template>
   <AuthCard>
-    <h2 class="auth-title">Ativar Conta</h2>
+    <h2 class="auth-title">Activate Account</h2>
     <p class="auth-subtitle">
-      Enviamos um código de 6 dígitos para <strong>{{ email }}</strong>.
+      We sent a 6-digit code to <strong>{{ email }}</strong>.
     </p>
 
     <form @submit.prevent="handleActivate" class="auth-form">
       <div class="code-input-group">
-        <label class="form-field__label">Código</label>
+        <label class="form-field__label">Code</label>
         <div class="code-inputs">
           <input
             v-for="(_, i) in 6"
@@ -28,12 +28,12 @@
       <div v-if="serverError" class="auth-error">{{ serverError }}</div>
 
       <BaseButton type="submit" :loading="loading" block>
-        Validar
+        Validate
       </BaseButton>
     </form>
 
     <p class="auth-link">
-      <router-link to="/login">Voltar</router-link>
+      <router-link to="/login">Go back</router-link>
     </p>
   </AuthCard>
 </template>
@@ -95,7 +95,7 @@ export default defineComponent({
     },
     async handleActivate(): Promise<void> {
       if (this.code.length !== 6) {
-        this.serverError = 'Digite o código completo de 6 dígitos'
+        this.serverError = 'Please enter the complete 6-digit code'
         return
       }
       this.loading = true
@@ -105,7 +105,7 @@ export default defineComponent({
         await activate(this.email, this.code)
       } catch (e: unknown) {
         const err = e as { response?: { data?: { message?: string } | string } }
-        this.serverError = (err.response?.data as { message?: string })?.message || err.response?.data as string || 'Código inválido. Tente novamente.'
+        this.serverError = (err.response?.data as { message?: string })?.message || err.response?.data as string || 'Invalid code. Please try again.'
       } finally {
         this.loading = false
       }

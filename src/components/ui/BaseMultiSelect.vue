@@ -29,7 +29,7 @@
             :checked="isUnselected"
             @change="selectUnselected"
           />
-          <span>Não Selecionado</span>
+          <span>Not Selected</span>
         </label>
 
         <div class="multiselect__divider" />
@@ -63,7 +63,7 @@ export default defineComponent({
   props: {
     modelValue: { type: Array as PropType<string[]>, default: () => ['*'] },
     options: { type: Array as PropType<SelectOption[]>, required: true },
-    wildcardLabel: { type: String, default: 'Todos' },
+    wildcardLabel: { type: String, default: 'All' },
     showUnselected: { type: Boolean, default: false }
   },
   emits: ['update:modelValue'],
@@ -79,14 +79,14 @@ export default defineComponent({
     },
     displayValue(): string {
       if (this.isWildcard) return this.wildcardLabel
-      if (this.isUnselected) return 'Não Selecionado'
+      if (this.isUnselected) return 'Not Selected'
       if (this.modelValue.length === 0) return this.wildcardLabel
       const labels = this.modelValue.map((v: string) => {
         const opt = this.options.find((o: SelectOption) => String(o.value) === String(v))
         return opt ? opt.label : v
       })
       if (labels.length <= 3) return labels.join(', ')
-      return `${labels.length} selecionados`
+      return `${labels.length} selected`
     }
   },
   methods: {

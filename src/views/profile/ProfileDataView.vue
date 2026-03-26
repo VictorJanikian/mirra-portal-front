@@ -1,14 +1,14 @@
 <template>
   <div class="profile-data">
     <div class="card">
-      <h2 class="profile-data__title">Meus dados</h2>
+      <h2 class="profile-data__title">My Data</h2>
       <div class="profile-data__fields">
         <div class="profile-data__field">
-          <span class="profile-data__label">Nome</span>
+          <span class="profile-data__label">Name</span>
           <span class="profile-data__value">{{ userName }}</span>
         </div>
         <div class="profile-data__field">
-          <span class="profile-data__label">E-mail</span>
+          <span class="profile-data__label">Email</span>
           <span class="profile-data__value">{{ userEmail }}</span>
         </div>
       </div>
