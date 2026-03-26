@@ -33,7 +33,7 @@
     </form>
 
     <p class="auth-link">
-      <router-link to="/login">Go back</router-link>
+      <router-link :to="{ path: '/login', query: $route.query.redirect ? { redirect: $route.query.redirect } : {} }">Go back</router-link>
     </p>
   </AuthCard>
 </template>

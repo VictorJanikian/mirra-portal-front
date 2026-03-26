@@ -28,7 +28,7 @@
     </form>
 
     <p class="auth-link">
-      Don't have an account? <router-link to="/register">Sign Up</router-link>
+      Don't have an account? <router-link :to="{ path: '/register', query: $route.query }">Sign Up</router-link>
     </p>
   </AuthCard>
 </template>

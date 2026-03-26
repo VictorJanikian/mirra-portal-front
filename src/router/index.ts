@@ -93,7 +93,7 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('mirra_token')
 
   if (to.meta.requiresAuth && !token) {
-    next({ name: 'Login' })
+    next({ name: 'Login', query: { redirect: to.fullPath } })
   } else if (to.meta.guest && token) {
     next({ name: 'Home' })
   } else {

@@ -8,13 +8,13 @@
     <div v-if="hasSuspendedNopayment" class="home__banner home__banner--warning">
       You have schedules suspended due to payment issues.
       <a :href="stripePortalUrl" target="_blank" rel="noopener" class="home__banner-link">Resolve your payment</a>
-      or limit the number of weekly posts.
+      or limit the number of weekly posts for the affected connections.
     </div>
 
     <div v-if="hasSuspendedDowngrade" class="home__banner home__banner--warning">
       You have schedules suspended due to a plan downgrade.
       <router-link :to="{ name: 'ProfilePlan' }" class="home__banner-link">Upgrade your plan</router-link>
-      or reduce the number of weekly posts.
+      or reduce the number of weekly posts for the affected connections.
     </div>
 
     <div v-if="loading" class="home__loading">

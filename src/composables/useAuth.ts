@@ -26,18 +26,23 @@ export function useAuth() {
   async function login(email: string, password: string): Promise<void> {
     const { data } = await authService.login(email, password)
     setSession(data)
-    router.push({ name: 'Home' })
+    const redirect = router.currentRoute.value.query.redirect as string | undefined
+    router.push(redirect || { name: 'Home' })
   }
 
   async function register(name: string, email: string, password: string): Promise<void> {
     await authService.register(name, email, password)
-    router.push({ name: 'Activate', query: { email } })
+    const redirect = router.currentRoute.value.query.redirect as string | undefined
+    const query: Record<string, string> = { email }
+    if (redirect) query.redirect = redirect
+    router.push({ name: 'Activate', query })
   }
 
   async function activate(email: string, code: string): Promise<void> {
     const { data } = await authService.activate(email, code)
     setSession(data)
-    router.push({ name: 'Home' })
+    const redirect = router.currentRoute.value.query.redirect as string | undefined
+    router.push(redirect || { name: 'Home' })
   }
 
   function logout(): void {

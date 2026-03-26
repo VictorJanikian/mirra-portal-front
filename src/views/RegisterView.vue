@@ -35,7 +35,7 @@
     </form>
 
     <p class="auth-link">
-      Already have an account? <router-link to="/login">Sign In</router-link>
+      Already have an account? <router-link :to="{ path: '/login', query: $route.query }">Sign In</router-link>
     </p>
   </AuthCard>
 </template>
