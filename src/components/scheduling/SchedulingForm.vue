@@ -256,6 +256,7 @@ export default defineComponent({
 .scheduling-form__status--inactive {
   color: #b91c1c;
   background: #fef2f2;
+  font-size: small;
 }
 
 .scheduling-form__banner {
