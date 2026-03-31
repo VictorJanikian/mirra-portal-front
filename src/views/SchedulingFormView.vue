@@ -86,6 +86,10 @@ export default defineComponent({
     }
   },
   watch: {
+    configId(): void {
+      this.schedulingApi = useSchedulings(this.configId)
+      this.loadData()
+    },
     schedulingId(): void {
       this.loadData()
     }
