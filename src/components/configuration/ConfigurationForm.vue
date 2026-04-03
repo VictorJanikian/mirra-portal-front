@@ -25,6 +25,7 @@
       v-model="form.Username"
       label="Username"
       placeholder="Username"
+      tooltip="This is not your WordPress admin login. Go to your WordPress admin panel → Users → Add New User, create a user with at least the 'Author' role, and enter that username here."
       :error="errors.Username"
     />
 
@@ -33,6 +34,7 @@
       label="Password"
       type="password"
       placeholder="Access password"
+      tooltip="Enter the password of the user you created in WordPress with the 'Author' role. This is not your admin panel password."
       :error="errors.Password"
     />
 

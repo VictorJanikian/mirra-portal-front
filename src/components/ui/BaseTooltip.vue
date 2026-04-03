@@ -52,9 +52,8 @@ export default defineComponent({
   visibility: hidden;
   opacity: 0;
   position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: calc(100% + 8px);
+  left: 0;
   background: #1e293b;
   color: #f8fafc;
   padding: 10px 14px;
@@ -74,12 +73,11 @@ export default defineComponent({
 .tooltip-text::after {
   content: "";
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 100%;
+  left: 12px;
   border-width: 6px;
   border-style: solid;
-  border-color: #1e293b transparent transparent transparent;
+  border-color: transparent transparent #1e293b transparent;
 }
 
 .tooltip-wrapper:hover .tooltip-text,
