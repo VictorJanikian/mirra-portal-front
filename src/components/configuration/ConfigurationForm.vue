@@ -1,5 +1,12 @@
 <template>
   <form @submit.prevent="handleSubmit" class="config-form">
+    <BaseInput
+      v-model="form.PlatformName"
+      label="Connection Name"
+      placeholder="My website"
+      :error="errors.PlatformName"
+    />
+
     <BaseSelect
       v-model="form.PlatformId"
       label="Platform"
@@ -50,6 +57,7 @@ import { useToast } from '@/composables/useToast'
 import type { SelectOption } from '@/types'
 
 interface ConfigFormData {
+  PlatformName: string
   PlatformId: string
   Url: string
   Username: string
@@ -66,6 +74,7 @@ export default defineComponent({
   data() {
     return {
       form: {
+        PlatformName: '',
         PlatformId: String(this.platformId),
         Url: '',
         Username: '',
@@ -81,6 +90,7 @@ export default defineComponent({
   methods: {
     validate(): boolean {
       this.errors = {}
+      if (!this.form.PlatformName) this.errors.PlatformName = 'Please enter the connection name'
       if (!this.form.Url) this.errors.Url = 'Please enter the URL'
       if (!this.form.Username) this.errors.Username = 'Please enter the username'
       if (!this.form.Password) this.errors.Password = 'Please enter the password'

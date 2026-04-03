@@ -59,6 +59,7 @@ export interface Configuration {
 }
 
 export interface ConfigurationCreatePayload {
+  PlatformName: string
   PlatformId: number
   Url: string
   Username: string
