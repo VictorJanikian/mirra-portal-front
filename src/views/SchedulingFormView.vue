@@ -21,6 +21,7 @@
         :scheduling="currentScheduling"
         :loading="saving"
         @submit="onSubmit"
+        @delete="onDeleteScheduling"
       />
 
       <div v-else class="scheduling-view__empty">

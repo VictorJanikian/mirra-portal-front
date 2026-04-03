@@ -9,6 +9,15 @@
       >
         {{ statusLabel }}
       </span>
+      <button
+        v-if="isEditing"
+        class="scheduling-form__delete"
+        type="button"
+        title="Delete schedule"
+        @click="$emit('delete', scheduling)"
+      >
+        <SvgIcon name="trash" :size="18" />
+      </button>
     </div>
 
     <div v-if="isEditing && scheduling && scheduling.Status === 2" class="scheduling-form__banner">
@@ -125,16 +134,17 @@ import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseTextarea from '@/components/ui/BaseTextarea.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import CronBuilder from './CronBuilder.vue'
+import SvgIcon from '@/components/ui/SvgIcon.vue'
 import type { Scheduling, SchedulingParameters } from '@/types'
 
 export default defineComponent({
   name: 'SchedulingForm',
-  components: { BaseInput, BaseTextarea, BaseButton, CronBuilder },
+  components: { BaseInput, BaseTextarea, BaseButton, CronBuilder, SvgIcon },
   props: {
     scheduling: { type: Object as PropType<Scheduling | null>, default: null },
     loading: { type: Boolean, default: false }
   },
-  emits: ['submit'],
+  emits: ['submit', 'delete'],
   data() {
     const params: Partial<SchedulingParameters> = this.scheduling?.Parameters || {}
     return {
@@ -259,6 +269,25 @@ export default defineComponent({
   font-size: small;
 }
 
+.scheduling-form__delete {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.scheduling-form__delete:hover {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
 .scheduling-form__banner {
   background: #fef3c7;
   color: #92400e;
@@ -268,6 +297,7 @@ export default defineComponent({
   font-size: var(--font-size-sm, 14px);
   line-height: 1.6;
   margin-bottom: var(--spacing-lg, 16px);
+  max-width: 800px;
 }
 
 .scheduling-form__banner-link {
