@@ -109,9 +109,9 @@ export default defineComponent({
         })
         this.$emit('saved')
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
+        const err = e as { response?: { data?: { Message?: string } } }
         const { error } = useToast()
-        error(err.response?.data?.message || 'Failed to create connection')
+        error(err.response?.data?.Message || 'Failed to create connection')
       } finally {
         this.loading = false
       }

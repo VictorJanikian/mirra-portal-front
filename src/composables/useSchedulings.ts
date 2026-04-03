@@ -16,8 +16,8 @@ export function useSchedulings(configId: string | number) {
       const { data } = await configurationService.get(configId)
       schedulings.value = data.Schedulings || []
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { message?: string } } }
-      error.value = err.response?.data?.message || 'Failed to load schedules'
+      const err = e as { response?: { data?: { Message?: string } } }
+      error.value = err.response?.data?.Message || 'Failed to load schedules'
     } finally {
       loading.value = false
     }
@@ -31,8 +31,8 @@ export function useSchedulings(configId: string | number) {
       current.value = data
       return data
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { message?: string } } }
-      error.value = err.response?.data?.message || 'Failed to load schedule'
+      const err = e as { response?: { data?: { Message?: string } } }
+      error.value = err.response?.data?.Message || 'Failed to load schedule'
     } finally {
       loading.value = false
     }

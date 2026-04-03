@@ -14,7 +14,7 @@ export function useToast() {
   }
 
   function success(msg: string): void { show(msg, 'success') }
-  function error(msg: string): void { show(msg, 'error') }
+  function error(msg: string): void { show(msg, 'error', 8000) }
   function info(msg: string): void { show(msg, 'info') }
 
   function dismiss(id: number): void {

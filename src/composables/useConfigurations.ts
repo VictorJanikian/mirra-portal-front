@@ -14,8 +14,8 @@ export function useConfigurations() {
       const { data } = await configurationService.getAll()
       configurations.value = data
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { message?: string } } }
-      error.value = err.response?.data?.message || 'Failed to load connections'
+      const err = e as { response?: { data?: { Message?: string } } }
+      error.value = err.response?.data?.Message || 'Failed to load connections'
     } finally {
       loading.value = false
     }

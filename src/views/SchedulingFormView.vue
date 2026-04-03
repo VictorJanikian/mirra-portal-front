@@ -167,8 +167,8 @@ export default defineComponent({
         this.schedulings = this.api.schedulings.value
         await this.refreshConfigurations()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        error(err.response?.data?.message || 'Failed to save schedule')
+        const err = e as { response?: { data?: { Message?: string } } }
+        error(err.response?.data?.Message || 'Failed to save schedule')
       } finally {
         this.saving = false
       }
@@ -198,8 +198,8 @@ export default defineComponent({
         this.schedulingToDelete = null
         await this.refreshConfigurations()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        error(err.response?.data?.message || 'Failed to remove schedule')
+        const err = e as { response?: { data?: { Message?: string } } }
+        error(err.response?.data?.Message || 'Failed to remove schedule')
       } finally {
         this.deleting = false
       }

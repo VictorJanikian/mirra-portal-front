@@ -45,8 +45,8 @@ export function useSubscription() {
     try {
       await Promise.all([fetchPlans(), fetchUserSubscription()])
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { message?: string } } }
-      error.value = err.response?.data?.message || 'Failed to load plans'
+      const err = e as { response?: { data?: { Message?: string } } }
+      error.value = err.response?.data?.Message || 'Failed to load plans'
     } finally {
       loading.value = false
     }
