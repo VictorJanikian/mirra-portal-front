@@ -66,6 +66,13 @@ export interface ConfigurationCreatePayload {
   Password: string
 }
 
+export interface ConfigurationUpdatePayload {
+  PlatformName: string
+  Url: string
+  Username: string
+  Password: string
+}
+
 // ─── Subscription ─────────────────────────────────────────
 
 export interface SubscriptionPlan {

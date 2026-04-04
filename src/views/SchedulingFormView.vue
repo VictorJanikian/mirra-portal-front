@@ -30,17 +30,14 @@
     </div>
 
     <!-- Delete confirmation -->
-    <BaseModal
+    <ConfirmModal
       :show="showDeleteModal"
       title="Confirm Deletion"
-      @close="showDeleteModal = false"
-    >
-      <p>Are you sure you want to remove this schedule?</p>
-      <template #footer>
-        <BaseButton variant="secondary" @click="showDeleteModal = false">Cancel</BaseButton>
-        <BaseButton variant="danger" :loading="deleting" @click="confirmDelete">Remove</BaseButton>
-      </template>
-    </BaseModal>
+      message="Are you sure you want to remove this schedule?"
+      :loading="deleting"
+      @confirm="confirmDelete"
+      @cancel="showDeleteModal = false"
+    />
   </div>
 </template>
 
@@ -48,8 +45,7 @@
 import { defineComponent, type PropType } from 'vue'
 import SchedulingList from '@/components/scheduling/SchedulingList.vue'
 import SchedulingForm from '@/components/scheduling/SchedulingForm.vue'
-import BaseModal from '@/components/ui/BaseModal.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import { useSchedulings } from '@/composables/useSchedulings'
 import { useConfigurations } from '@/composables/useConfigurations'
 import { useToast } from '@/composables/useToast'
@@ -57,7 +53,7 @@ import type { Scheduling, SchedulingPayload } from '@/types'
 
 export default defineComponent({
   name: 'SchedulingFormView',
-  components: { SchedulingList, SchedulingForm, BaseModal, BaseButton },
+  components: { SchedulingList, SchedulingForm, ConfirmModal },
   props: {
     configId: { type: [String, Number] as PropType<string | number>, required: true },
     schedulingId: { type: [String, Number] as PropType<string | number>, default: null }

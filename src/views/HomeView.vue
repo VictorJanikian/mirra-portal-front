@@ -130,6 +130,14 @@
                 <span class="config-item__badge">
                   {{ (config.Schedulings || []).length }} schedule{{ (config.Schedulings || []).length !== 1 ? 's' : '' }}
                 </span>
+                <div class="config-item__actions" @click.stop>
+                  <button class="config-item__action-btn" title="Edit connection" @click="openEditConfig(config)">
+                    <SvgIcon name="edit" :size="15" />
+                  </button>
+                  <button class="config-item__action-btn config-item__action-btn--danger" title="Delete connection" @click="openDeleteConfig(config)">
+                    <SvgIcon name="trash" :size="15" />
+                  </button>
+                </div>
                 <svg
                   class="config-item__expand"
                   :class="{ 'config-item__expand--open': isExpanded(config.Id) }"
@@ -255,14 +263,65 @@
         </div>
       </transition>
     </template>
+
+    <!-- Edit connection modal -->
+    <BaseModal
+      :show="showEditModal"
+      title="Edit Connection"
+      @close="showEditModal = false"
+    >
+      <form @submit.prevent="submitEditConfig" class="config-edit-form">
+        <BaseInput
+          v-model="editForm.PlatformName"
+          label="Connection Name"
+          placeholder="My website"
+        />
+        <BaseInput
+          v-model="editForm.Url"
+          label="Website URL"
+          placeholder="https://mysite.com"
+        />
+        <BaseInput
+          v-model="editForm.Username"
+          label="Username"
+          placeholder="Username"
+          tooltip="This is not your WordPress admin login. Go to your WordPress admin panel → Users → Add New User, create a user with at least the 'Author' role, and enter that username here."
+        />
+        <BaseInput
+          v-model="editForm.Password"
+          label="Password"
+          type="password"
+          placeholder="Leave blank to keep current"
+        />
+        <div class="config-edit-form__actions">
+          <BaseButton type="submit" :loading="editLoading">Save</BaseButton>
+          <BaseButton variant="secondary" @click="showEditModal = false">Cancel</BaseButton>
+        </div>
+      </form>
+    </BaseModal>
+
+    <!-- Delete connection confirmation -->
+    <ConfirmModal
+      :show="showDeleteConfigModal"
+      title="Delete Connection"
+      message="Are you sure you want to delete this connection? All its schedules will also be removed."
+      :loading="deleteLoading"
+      @confirm="confirmDeleteConfig"
+      @cancel="showDeleteConfigModal = false"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
+import { useToast } from '@/composables/useToast'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
 import SvgIcon from '@/components/ui/SvgIcon.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import schedulingService from '@/services/schedulingService'
 import subscriptionService from '@/services/subscriptionService'
 import type { Configuration, Scheduling } from '@/types'
@@ -276,7 +335,7 @@ interface SchedulingItem {
 
 export default defineComponent({
   name: 'HomeView',
-  components: { PlatformIcon, SvgIcon },
+  components: { PlatformIcon, SvgIcon, BaseModal, BaseInput, BaseButton, ConfirmModal },
   inject: {
     openNewConfigurationModal: { default: () => function noop() { /* noop */ } }
   },
@@ -286,7 +345,16 @@ export default defineComponent({
       expandedConfigs: [] as number[],
       hasSuspendedNopayment: false,
       hasSuspendedDowngrade: false,
-      canCreateConfig: true
+      canCreateConfig: true,
+      // Edit connection
+      showEditModal: false,
+      editLoading: false,
+      editConfigId: null as number | null,
+      editForm: { PlatformName: '', Url: '', Username: '', Password: '' },
+      // Delete connection
+      showDeleteConfigModal: false,
+      deleteLoading: false,
+      deleteConfigId: null as number | null
     }
   },
   async mounted() {
@@ -355,6 +423,53 @@ export default defineComponent({
     },
     openNewConfig(platformId: number): void {
       (this.openNewConfigurationModal as (id: number) => void)(platformId)
+    },
+    openEditConfig(config: Configuration): void {
+      this.editConfigId = config.Id
+      this.editForm = {
+        PlatformName: config.PlatformName,
+        Url: config.Url,
+        Username: config.Username,
+        Password: ''
+      }
+      this.showEditModal = true
+    },
+    async submitEditConfig(): Promise<void> {
+      if (!this.editConfigId) return
+      this.editLoading = true
+      const { success, error } = useToast()
+      try {
+        const { update } = useConfigurations()
+        await update(this.editConfigId, this.editForm)
+        success('Connection updated successfully!')
+        this.showEditModal = false
+      } catch (e: unknown) {
+        const err = e as { response?: { data?: { Message?: string } } }
+        error(err.response?.data?.Message || 'Failed to update connection')
+      } finally {
+        this.editLoading = false
+      }
+    },
+    openDeleteConfig(config: Configuration): void {
+      this.deleteConfigId = config.Id
+      this.showDeleteConfigModal = true
+    },
+    async confirmDeleteConfig(): Promise<void> {
+      if (!this.deleteConfigId) return
+      this.deleteLoading = true
+      const { success, error } = useToast()
+      try {
+        const { remove } = useConfigurations()
+        await remove(this.deleteConfigId)
+        success('Connection deleted successfully!')
+        this.showDeleteConfigModal = false
+        this.deleteConfigId = null
+      } catch (e: unknown) {
+        const err = e as { response?: { data?: { Message?: string } } }
+        error(err.response?.data?.Message || 'Failed to delete connection')
+      } finally {
+        this.deleteLoading = false
+      }
     }
   }
 })
@@ -718,6 +833,48 @@ export default defineComponent({
   border-radius: 12px;
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.config-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.config-item__action-btn {
+  background: none;
+  border: none;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.config-item__action-btn:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.config-item__action-btn--danger:hover {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.config-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.config-edit-form__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
 }
 
 .config-item__expand {

@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import configurationService from '@/services/configurationService'
-import type { Configuration, ConfigurationCreatePayload } from '@/types'
+import type { Configuration, ConfigurationCreatePayload, ConfigurationUpdatePayload } from '@/types'
 
 const configurations = ref<Configuration[]>([])
 const loading = ref(false)
@@ -27,9 +27,21 @@ export function useConfigurations() {
     return data
   }
 
+  async function update(configId: number, payload: ConfigurationUpdatePayload): Promise<Configuration> {
+    const { data } = await configurationService.update(configId, payload)
+    const index = configurations.value.findIndex(c => c.Id === configId)
+    if (index !== -1) configurations.value[index] = data
+    return data
+  }
+
+  async function remove(configId: number): Promise<void> {
+    await configurationService.delete(configId)
+    configurations.value = configurations.value.filter(c => c.Id !== configId)
+  }
+
   function getByPlatform(platformId: number): Configuration[] {
     return configurations.value.filter(c => c.PlatformId === platformId)
   }
 
-  return { configurations, loading, error, fetchAll, create, getByPlatform }
+  return { configurations, loading, error, fetchAll, create, update, remove, getByPlatform }
 }
