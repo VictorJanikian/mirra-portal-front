@@ -13,5 +13,13 @@ export default {
 
   activate(email: string, code: string): Promise<AxiosResponse<AuthResponse>> {
     return api.post('/api/account/activate', { Email: email, Code: code })
+  },
+
+  forgotPassword(email: string): Promise<AxiosResponse<void>> {
+    return api.post('/api/account/forgot-password', { Email: email })
+  },
+
+  resetPassword(email: string, code: string, newPassword: string): Promise<AxiosResponse<AuthResponse>> {
+    return api.post('/api/account/reset-password', { Email: email, Code: code, NewPassword: newPassword })
   }
 }

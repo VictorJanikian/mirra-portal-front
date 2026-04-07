@@ -45,6 +45,21 @@ export function useAuth() {
     router.push(redirect || { name: 'Home' })
   }
 
+  async function forgotPassword(email: string): Promise<void> {
+    await authService.forgotPassword(email)
+    const redirect = router.currentRoute.value.query.redirect as string | undefined
+    const query: Record<string, string> = { email }
+    if (redirect) query.redirect = redirect
+    router.push({ name: 'ResetPassword', query })
+  }
+
+  async function resetPassword(email: string, code: string, newPassword: string): Promise<void> {
+    const { data } = await authService.resetPassword(email, code, newPassword)
+    setSession(data)
+    const redirect = router.currentRoute.value.query.redirect as string | undefined
+    router.push(redirect || { name: 'Home' })
+  }
+
   function logout(): void {
     state.user = null
     state.token = null
@@ -53,5 +68,5 @@ export function useAuth() {
     router.push({ name: 'Login' })
   }
 
-  return { state, isAuthenticated, login, register, activate, logout }
+  return { state, isAuthenticated, login, register, activate, forgotPassword, resetPassword, logout }
 }

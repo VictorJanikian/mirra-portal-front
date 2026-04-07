@@ -1,9 +1,9 @@
 <template>
   <AuthCard>
-    <h2 class="auth-title">Welcome back</h2>
-    <p class="auth-subtitle">Sign in to your account to continue</p>
+    <h2 class="auth-title">Forgot password</h2>
+    <p class="auth-subtitle">Enter your email and we'll send you a code to reset your password.</p>
 
-    <form @submit.prevent="handleLogin" class="auth-form">
+    <form @submit.prevent="handleForgotPassword" class="auth-form">
       <BaseInput
         v-model="email"
         label="Email"
@@ -12,29 +12,15 @@
         :error="errors.email"
       />
 
-      <BaseInput
-        v-model="password"
-        label="Password"
-        type="password"
-        placeholder="Your password"
-        :error="errors.password"
-      />
-
-      <div class="auth-forgot">
-        <router-link :to="{ path: '/forgot-password', query: $route.query }">
-          Forgot my password
-        </router-link>
-      </div>
-
       <div v-if="serverError" class="auth-error">{{ serverError }}</div>
 
       <BaseButton type="submit" :loading="loading" block>
-        Sign In
+        Send code
       </BaseButton>
     </form>
 
     <p class="auth-link">
-      Don't have an account? <router-link :to="{ path: '/register', query: $route.query }">Sign Up</router-link>
+      <router-link :to="{ path: '/login', query: $route.query }">Go back</router-link>
     </p>
   </AuthCard>
 </template>
@@ -47,41 +33,43 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import { useAuth } from '@/composables/useAuth'
 import { isValidEmail } from '@/utils/validators'
 
-interface LoginErrors {
+interface ForgotPasswordErrors {
   email: string
-  password: string
 }
 
 export default defineComponent({
-  name: 'LoginView',
+  name: 'ForgotPasswordView',
   components: { AuthCard, BaseInput, BaseButton },
   data() {
     return {
       email: '',
-      password: '',
       loading: false,
       serverError: '',
-      errors: { email: '', password: '' } as LoginErrors
+      errors: { email: '' } as ForgotPasswordErrors
     }
   },
   methods: {
     validate(): boolean {
-      this.errors = { email: '', password: '' }
+      this.errors = { email: '' }
       if (!this.email) this.errors.email = 'Please enter your email'
       else if (!isValidEmail(this.email)) this.errors.email = 'Invalid email'
-      if (!this.password) this.errors.password = 'Please enter your password'
-      return !this.errors.email && !this.errors.password
+      return !this.errors.email
     },
-    async handleLogin(): Promise<void> {
+    async handleForgotPassword(): Promise<void> {
       if (!this.validate()) return
       this.loading = true
       this.serverError = ''
       try {
-        const { login } = useAuth()
-        await login(this.email, this.password)
+        const { forgotPassword } = useAuth()
+        await forgotPassword(this.email)
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } | string } }
-        this.serverError = (err.response?.data as { message?: string })?.message || err.response?.data as string || 'Login failed. Please check your credentials.'
+        const err = e as { response?: { data?: { Message?: string; message?: string } | string } }
+        const data = err.response?.data
+        if (typeof data === 'string') {
+          this.serverError = data
+        } else {
+          this.serverError = data?.Message || data?.message || 'Unable to send the reset code. Please try again.'
+        }
       } finally {
         this.loading = false
       }
@@ -102,6 +90,7 @@ export default defineComponent({
   color: var(--color-gray-500);
   font-size: var(--font-size-base);
   margin-bottom: var(--spacing-xl);
+  line-height: 1.5;
 }
 
 .auth-form {
@@ -117,23 +106,6 @@ export default defineComponent({
   border-radius: var(--border-radius-sm);
   font-size: var(--font-size-sm);
   border: 1px solid #fecaca;
-}
-
-.auth-forgot {
-  text-align: right;
-  font-size: var(--font-size-sm);
-  margin-top: calc(var(--spacing-md) * -1 + 12px);
-}
-
-.auth-forgot a {
-  color: var(--color-primary);
-  font-weight: 500;
-  text-decoration: none;
-  transition: color var(--transition-fast);
-}
-
-.auth-forgot a:hover {
-  color: var(--color-primary-hover);
 }
 
 .auth-link {
