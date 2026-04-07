@@ -64,6 +64,7 @@ export interface ConfigurationCreatePayload {
   Url: string
   Username: string
   Password: string
+  Schedulings: Scheduling[]
 }
 
 export interface ConfigurationUpdatePayload {

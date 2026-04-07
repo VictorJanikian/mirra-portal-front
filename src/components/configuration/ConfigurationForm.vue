@@ -105,7 +105,8 @@ export default defineComponent({
         const { create } = useConfigurations()
         await create({
           ...this.form,
-          PlatformId: Number(this.form.PlatformId)
+          PlatformId: Number(this.form.PlatformId),
+          Schedulings: []
         })
         this.$emit('saved')
       } catch (e: unknown) {
