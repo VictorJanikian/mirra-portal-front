@@ -80,8 +80,13 @@ export default defineComponent({
         const { login } = useAuth()
         await login(this.email, this.password)
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } | string } }
-        this.serverError = (err.response?.data as { message?: string })?.message || err.response?.data as string || 'Login failed. Please check your credentials.'
+        const err = e as { response?: { data?: { Message?: string; message?: string } | string } }
+        const data = err.response?.data
+        if (typeof data === 'string') {
+          this.serverError = data
+        } else {
+          this.serverError = data?.Message || data?.message || 'Login failed. Please check your credentials.'
+        }
       } finally {
         this.loading = false
       }
