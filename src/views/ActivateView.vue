@@ -104,8 +104,13 @@ export default defineComponent({
         const { activate } = useAuth()
         await activate(this.email, this.code)
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } | string } }
-        this.serverError = (err.response?.data as { message?: string })?.message || err.response?.data as string || 'Invalid code. Please try again.'
+        const err = e as { response?: { data?: { Message?: string; message?: string } | string } }
+        const data = err.response?.data
+        if (typeof data === 'string') {
+          this.serverError = data
+        } else {
+          this.serverError = data?.Message || data?.message || 'Invalid code. Please try again.'
+        }
       } finally {
         this.loading = false
       }
