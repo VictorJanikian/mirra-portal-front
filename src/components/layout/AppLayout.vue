@@ -40,6 +40,7 @@ import AppHeader from './AppHeader.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import ConfigurationForm from '@/components/configuration/ConfigurationForm.vue'
 import { useConfigurations } from '@/composables/useConfigurations'
+import { useSubscription } from '@/composables/useSubscription'
 import { useToast } from '@/composables/useToast'
 
 export default defineComponent({
@@ -65,7 +66,8 @@ export default defineComponent({
     async onConfigSaved(): Promise<void> {
       this.showConfigModal = false
       const { fetchAll } = useConfigurations()
-      await fetchAll()
+      const { fetchRemainingConfigurations } = useSubscription()
+      await Promise.all([fetchAll(), fetchRemainingConfigurations()])
       const { success } = useToast()
       success('Connection created successfully!')
     }
