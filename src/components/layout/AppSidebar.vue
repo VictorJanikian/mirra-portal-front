@@ -176,7 +176,7 @@
 import { defineComponent } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useConfigurations } from '@/composables/useConfigurations'
-import subscriptionService from '@/services/subscriptionService'
+import { useSubscription } from '@/composables/useSubscription'
 import SvgIcon from '@/components/ui/SvgIcon.vue'
 import type { Configuration } from '@/types'
 
@@ -192,7 +192,6 @@ export default defineComponent({
       expandedPlatform: null as number | null,
       expandedConfig: null as number | null,
       profileHover: false,
-      canCreateConfig: true,
       configTooltipVisible: false,
       configTooltipStyle: {} as Record<string, string>,
       configTooltipTimer: null as ReturnType<typeof setTimeout> | null
@@ -203,6 +202,10 @@ export default defineComponent({
     wordpressConfigs(): Configuration[] {
       const { configurations } = useConfigurations()
       return configurations.value.filter((c: Configuration) => c.PlatformId === 1)
+    },
+    canCreateConfig(): boolean {
+      const { canCreateConfig } = useSubscription()
+      return canCreateConfig.value
     }
   },
   methods: {
@@ -251,14 +254,10 @@ export default defineComponent({
   },
   async mounted() {
     const { fetchAll } = useConfigurations()
+    const { fetchRemainingConfigurations } = useSubscription()
     fetchAll()
     this.expandedPlatform = 1
-    try {
-      const res = await subscriptionService.getRemainingConfigurations()
-      this.canCreateConfig = res.data.remainingConfigurations > 0
-    } catch {
-      this.canCreateConfig = true
-    }
+    await fetchRemainingConfigurations()
   }
 })
 </script>

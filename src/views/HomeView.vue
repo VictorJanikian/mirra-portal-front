@@ -315,6 +315,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
+import { useSubscription } from '@/composables/useSubscription'
 import { useToast } from '@/composables/useToast'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
 import SvgIcon from '@/components/ui/SvgIcon.vue'
@@ -323,7 +324,6 @@ import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import schedulingService from '@/services/schedulingService'
-import subscriptionService from '@/services/subscriptionService'
 import type { Configuration, Scheduling } from '@/types'
 
 interface SchedulingItem {
@@ -345,7 +345,6 @@ export default defineComponent({
       expandedConfigs: [] as number[],
       hasSuspendedNopayment: false,
       hasSuspendedDowngrade: false,
-      canCreateConfig: true,
       // Edit connection
       showEditModal: false,
       editLoading: false,
@@ -358,19 +357,23 @@ export default defineComponent({
     }
   },
   async mounted() {
-    const [nopayment, downgrade, remaining] = await Promise.all([
+    const { fetchRemainingConfigurations } = useSubscription()
+    const [nopayment, downgrade] = await Promise.all([
       schedulingService.hasSuspendedNopayment().catch(() => ({ data: false })),
       schedulingService.hasSuspendedDowngrade().catch(() => ({ data: false })),
-      subscriptionService.getRemainingConfigurations().catch(() => ({ data: { remainingConfigurations: 1 } }))
+      fetchRemainingConfigurations()
     ])
     this.hasSuspendedNopayment = nopayment.data
     this.hasSuspendedDowngrade = downgrade.data
-    this.canCreateConfig = remaining.data.remainingConfigurations > 0
   },
   computed: {
     loading(): boolean {
       const { loading } = useConfigurations()
       return loading.value
+    },
+    canCreateConfig(): boolean {
+      const { canCreateConfig } = useSubscription()
+      return canCreateConfig.value
     },
     configurations(): Configuration[] {
       const { configurations } = useConfigurations()
@@ -460,7 +463,9 @@ export default defineComponent({
       const { success, error } = useToast()
       try {
         const { remove } = useConfigurations()
+        const { fetchRemainingConfigurations } = useSubscription()
         await remove(this.deleteConfigId)
+        await fetchRemainingConfigurations()
         success('Connection deleted successfully!')
         this.showDeleteConfigModal = false
         this.deleteConfigId = null

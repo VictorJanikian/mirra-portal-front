@@ -4,10 +4,13 @@ import type { SubscriptionPlan, UserSubscription } from '@/types'
 
 const plans = ref<SubscriptionPlan[]>([])
 const userSubscription = ref<UserSubscription | null>(null)
+const remainingConfigurations = ref<number>(1)
 const loading = ref(false)
 const error = ref<string | null>(null)
 
 export function useSubscription() {
+  const canCreateConfig = computed(() => remainingConfigurations.value > 0)
+
   const sortedPlans = computed(() =>
     [...plans.value].sort((a, b) => a.Price - b.Price)
   )
@@ -39,6 +42,15 @@ export function useSubscription() {
     userSubscription.value = data
   }
 
+  async function fetchRemainingConfigurations(): Promise<void> {
+    try {
+      const { data } = await subscriptionService.getRemainingConfigurations()
+      remainingConfigurations.value = data.remainingConfigurations
+    } catch {
+      remainingConfigurations.value = 0
+    }
+  }
+
   async function fetchAll(): Promise<void> {
     loading.value = true
     error.value = null
@@ -53,8 +65,8 @@ export function useSubscription() {
   }
 
   return {
-    plans, userSubscription, loading, error,
-    sortedPlans, currentPlan, highestPlan, isOnHighestPlan, isOnFreePlan,
-    fetchPlans, fetchUserSubscription, fetchAll
+    plans, userSubscription, remainingConfigurations, loading, error,
+    sortedPlans, currentPlan, highestPlan, isOnHighestPlan, isOnFreePlan, canCreateConfig,
+    fetchPlans, fetchUserSubscription, fetchRemainingConfigurations, fetchAll
   }
 }
