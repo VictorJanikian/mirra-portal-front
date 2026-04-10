@@ -98,12 +98,7 @@ export default defineComponent({
   computed: {
     computedExpression(): string {
       if (this.advancedMode) return this.rawExpression
-      const min = buildCronField(this.fields.minutes)
-      const hour = buildCronField(this.fields.hours)
-      const dom = buildCronField(this.fields.daysOfMonth)
-      const month = buildCronField(this.fields.months)
-      const dow = buildCronField(this.fields.weekdays)
-      return `${min} ${hour} ${dom} ${month} ${dow}`
+      return this.buildFromFields()
     },
     minuteOptions(): SelectOption[] {
       return [
@@ -167,11 +162,22 @@ export default defineComponent({
         weekdays: parseCronField(parts[4] || '*')
       }
     },
+    buildFromFields(): string {
+      const min = buildCronField(this.fields.minutes)
+      const hour = buildCronField(this.fields.hours)
+      const dom = buildCronField(this.fields.daysOfMonth)
+      const month = buildCronField(this.fields.months)
+      const dow = buildCronField(this.fields.weekdays)
+      return `${min} ${hour} ${dom} ${month} ${dow}`
+    },
     updateField(field: keyof CronFields, value: string[]) {
       this.fields[field] = value
+      // Keep rawExpression in sync so toggling to advanced mode shows the latest edits
+      this.rawExpression = this.buildFromFields()
     },
     onRawInput() {
-      // Raw expression is already v-modeled
+      // Keep fields in sync so toggling to simple mode reflects the latest raw expression
+      this.fields = this.parseExpression(this.rawExpression)
     }
   }
 })
