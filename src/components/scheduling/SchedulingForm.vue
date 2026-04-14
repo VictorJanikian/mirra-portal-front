@@ -117,6 +117,7 @@
 
       <CronBuilder
         v-model="cronExpression"
+        v-model:timezone="timezone"
       />
 
       <div class="scheduling-form__actions">
@@ -135,6 +136,7 @@ import BaseTextarea from '@/components/ui/BaseTextarea.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import CronBuilder from './CronBuilder.vue'
 import SvgIcon from '@/components/ui/SvgIcon.vue'
+import { detectUserTimezone } from '@/constants/timezones'
 import type { Scheduling, SchedulingParameters } from '@/types'
 
 export default defineComponent({
@@ -162,7 +164,8 @@ export default defineComponent({
         SEOAdditionalInformation: params.SEOAdditionalInformation || '',
         Language: params.Language || 'en-US'
       } as SchedulingParameters,
-      cronExpression: this.scheduling?.Interval || '* * * * *'
+      cronExpression: this.scheduling?.Interval || '* * * * *',
+      timezone: this.scheduling?.Timezone || detectUserTimezone()
     }
   },
   computed: {
@@ -181,7 +184,8 @@ export default defineComponent({
     handleSubmit(): void {
       this.$emit('submit', {
         ...this.formData,
-        cronExpression: this.cronExpression
+        cronExpression: this.cronExpression,
+        timezone: this.timezone
       })
     }
   },
@@ -205,6 +209,7 @@ export default defineComponent({
             Language: params.Language || 'en-US'
           } as SchedulingParameters
           this.cronExpression = val.Interval || '* * * * *'
+          this.timezone = val.Timezone || detectUserTimezone()
         } else {
           this.formData = {
             ThemeTitle: '',
@@ -221,6 +226,7 @@ export default defineComponent({
             Language: 'en-US'
           } as SchedulingParameters
           this.cronExpression = '* * * * *'
+          this.timezone = detectUserTimezone()
         }
       },
       deep: true

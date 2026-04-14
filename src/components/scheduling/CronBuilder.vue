@@ -71,6 +71,18 @@
     </div>
 
     <CronPreview :expression="computedExpression" />
+
+    <div class="cron-builder__timezone">
+      <label class="cron-builder__timezone-label" for="cron-timezone-select">Timezone</label>
+      <select
+        id="cron-timezone-select"
+        class="form-field__select cron-builder__timezone-select"
+        :value="timezone"
+        @change="onTimezoneChange($event)"
+      >
+        <option v-for="tz in timezoneOptions" :key="tz" :value="tz">{{ tz }}</option>
+      </select>
+    </div>
   </div>
 </template>
 
@@ -79,15 +91,17 @@ import { defineComponent } from 'vue'
 import CronFieldSelect from './CronFieldSelect.vue'
 import CronPreview from './CronPreview.vue'
 import { parseCronField, buildCronField } from '@/utils/cronParser'
+import { TIMEZONES } from '@/constants/timezones'
 import type { CronFields, SelectOption } from '@/types'
 
 export default defineComponent({
   name: 'CronBuilder',
   components: { CronFieldSelect, CronPreview },
   props: {
-    modelValue: { type: String, default: '* * * * *' }
+    modelValue: { type: String, default: '* * * * *' },
+    timezone: { type: String, default: '' }
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'update:timezone'],
   data() {
     return {
       advancedMode: false,
@@ -137,6 +151,9 @@ export default defineComponent({
         { value: '5', label: 'Friday' },
         { value: '6', label: 'Saturday' }
       ]
+    },
+    timezoneOptions(): string[] {
+      return TIMEZONES
     }
   },
   watch: {
@@ -178,6 +195,10 @@ export default defineComponent({
     onRawInput() {
       // Keep fields in sync so toggling to simple mode reflects the latest raw expression
       this.fields = this.parseExpression(this.rawExpression)
+    },
+    onTimezoneChange(ev: Event) {
+      const target = ev.target as HTMLSelectElement
+      this.$emit('update:timezone', target.value)
     }
   }
 })
@@ -259,6 +280,34 @@ export default defineComponent({
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
+}
+
+.cron-builder__timezone {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.cron-builder__timezone-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.cron-builder__timezone-select {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%236b7280' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 8px;
+  padding-right: 38px;
+  cursor: pointer;
 }
 
 .cron-builder__advanced {

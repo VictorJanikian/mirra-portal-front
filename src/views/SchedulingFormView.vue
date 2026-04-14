@@ -143,9 +143,10 @@ export default defineComponent({
       this.saving = true
       const { success, error } = useToast()
       try {
-        const { cronExpression, ...parameters } = formData
+        const { cronExpression, timezone, ...parameters } = formData
         const payload: SchedulingPayload = {
           Interval: (cronExpression as string) || '* * * * *',
+          Timezone: (timezone as string) || '',
           Parameters: parameters as unknown as SchedulingPayload['Parameters']
         }
 

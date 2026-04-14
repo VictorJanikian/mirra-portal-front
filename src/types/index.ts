@@ -36,12 +36,14 @@ export interface SchedulingParameters {
 export interface Scheduling {
   Id: number
   Interval: string
+  Timezone: string
   Status: number
   Parameters: SchedulingParameters
 }
 
 export interface SchedulingPayload {
   Interval: string
+  Timezone: string
   Parameters: SchedulingParameters
 }
 
