@@ -145,7 +145,7 @@ export default defineComponent({
       try {
         const { cronExpression, timezone, ...parameters } = formData
         const payload: SchedulingPayload = {
-          Interval: (cronExpression as string) || '* * * * *',
+          Interval: (cronExpression as string) || '0 * * * *',
           Timezone: (timezone as string) || '',
           Parameters: parameters as unknown as SchedulingPayload['Parameters']
         }
@@ -204,7 +204,7 @@ export default defineComponent({
 
     getCronFromForm(): string {
       // Fallback: get cron from CronBuilder v-model
-      return '* * * * *'
+      return '0 * * * *'
     },
 
     async refreshConfigurations(): Promise<void> {

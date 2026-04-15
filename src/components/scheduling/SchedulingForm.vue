@@ -164,7 +164,7 @@ export default defineComponent({
         SEOAdditionalInformation: params.SEOAdditionalInformation || '',
         Language: params.Language || 'en-US'
       } as SchedulingParameters,
-      cronExpression: this.scheduling?.Interval || '* * * * *',
+      cronExpression: this.scheduling?.Interval || '0 * * * *',
       timezone: this.scheduling?.Timezone || detectUserTimezone()
     }
   },
@@ -208,7 +208,7 @@ export default defineComponent({
             SEOAdditionalInformation: params.SEOAdditionalInformation || '',
             Language: params.Language || 'en-US'
           } as SchedulingParameters
-          this.cronExpression = val.Interval || '* * * * *'
+          this.cronExpression = val.Interval || '0 * * * *'
           this.timezone = val.Timezone || detectUserTimezone()
         } else {
           this.formData = {
@@ -225,7 +225,7 @@ export default defineComponent({
             SEOAdditionalInformation: '',
             Language: 'en-US'
           } as SchedulingParameters
-          this.cronExpression = '* * * * *'
+          this.cronExpression = '0 * * * *'
           this.timezone = detectUserTimezone()
         }
       },

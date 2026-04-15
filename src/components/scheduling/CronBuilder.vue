@@ -19,7 +19,7 @@
           :model-value="fields.minutes"
           :options="minuteOptions"
           :multiple="false"
-          wildcard-label="Every minute"
+          :hide-wildcard="true"
           @update:model-value="updateField('minutes', $event)"
         />
         <CronFieldSelect
@@ -98,15 +98,15 @@ export default defineComponent({
   name: 'CronBuilder',
   components: { CronFieldSelect, CronPreview },
   props: {
-    modelValue: { type: String, default: '* * * * *' },
+    modelValue: { type: String, default: '0 * * * *' },
     timezone: { type: String, default: '' }
   },
   emits: ['update:modelValue', 'update:timezone'],
   data() {
     return {
       advancedMode: false,
-      rawExpression: this.modelValue || '* * * * *',
-      fields: this.parseExpression(this.modelValue || '* * * * *') as CronFields
+      rawExpression: this.modelValue || '0 * * * *',
+      fields: this.parseExpression(this.modelValue || '0 * * * *') as CronFields
     }
   },
   computed: {
@@ -169,10 +169,11 @@ export default defineComponent({
   },
   methods: {
     parseExpression(expr: string): CronFields {
-      if (!expr) return { minutes: ['*'], hours: ['*'], daysOfMonth: ['*'], months: ['*'], weekdays: ['*'] }
+      if (!expr) return { minutes: ['0'], hours: ['*'], daysOfMonth: ['*'], months: ['*'], weekdays: ['*'] }
       const parts = expr.trim().split(/\s+/)
+      const minutes = parseCronField(parts[0] || '0')
       return {
-        minutes: parseCronField(parts[0] || '*'),
+        minutes: minutes[0] === '*' ? ['0'] : minutes,
         hours: parseCronField(parts[1] || '*'),
         daysOfMonth: parseCronField(parts[2] || '*'),
         months: parseCronField(parts[3] || '*'),

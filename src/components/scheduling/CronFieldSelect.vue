@@ -40,14 +40,20 @@ export default defineComponent({
     options: { type: Array as PropType<SelectOption[]>, required: true },
     wildcardLabel: { type: String, default: 'All' },
     multiple: { type: Boolean, default: true },
-    showUnselected: { type: Boolean, default: false }
+    showUnselected: { type: Boolean, default: false },
+    hideWildcard: { type: Boolean, default: false }
   },
   emits: ['update:modelValue'],
   computed: {
     singleValue(): string {
-      return this.modelValue[0] || '*'
+      const v = this.modelValue[0]
+      if (this.hideWildcard && (v === '*' || !v)) {
+        return this.options[0]?.value || ''
+      }
+      return v || '*'
     },
     singleOptions(): SelectOption[] {
+      if (this.hideWildcard) return this.options
       return [{ value: '*', label: this.wildcardLabel }, ...this.options]
     }
   }
