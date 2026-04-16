@@ -159,6 +159,10 @@ export default defineComponent({
           this.currentScheduling = created
           this.currentSchedulingId = created.Id
           success('Schedule created successfully!')
+          this.$router.replace({
+            name: 'SchedulingEdit',
+            params: { configId: String(this.configId), schedulingId: String(created.Id) }
+          })
         }
 
         this.schedulings = this.api.schedulings.value
