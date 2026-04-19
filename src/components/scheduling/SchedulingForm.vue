@@ -137,6 +137,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import CronBuilder from './CronBuilder.vue'
 import SvgIcon from '@/components/ui/SvgIcon.vue'
 import { detectUserTimezone } from '@/constants/timezones'
+import { cronUtcToTimezone } from '@/utils/cronTimezone'
 import type { Scheduling, SchedulingParameters } from '@/types'
 
 export default defineComponent({
@@ -149,6 +150,10 @@ export default defineComponent({
   emits: ['submit', 'delete'],
   data() {
     const params: Partial<SchedulingParameters> = this.scheduling?.Parameters || {}
+    const initialTimezone = this.scheduling?.Timezone || detectUserTimezone()
+    const initialCron = this.scheduling?.Interval
+      ? cronUtcToTimezone(this.scheduling.Interval, initialTimezone)
+      : '0 * * * *'
     return {
       formData: {
         ThemeTitle: params.ThemeTitle || '',
@@ -164,8 +169,8 @@ export default defineComponent({
         SEOAdditionalInformation: params.SEOAdditionalInformation || '',
         Language: params.Language || 'en-US'
       } as SchedulingParameters,
-      cronExpression: this.scheduling?.Interval || '0 * * * *',
-      timezone: this.scheduling?.Timezone || detectUserTimezone()
+      cronExpression: initialCron,
+      timezone: initialTimezone
     }
   },
   computed: {
@@ -208,8 +213,9 @@ export default defineComponent({
             SEOAdditionalInformation: params.SEOAdditionalInformation || '',
             Language: params.Language || 'en-US'
           } as SchedulingParameters
-          this.cronExpression = val.Interval || '0 * * * *'
-          this.timezone = val.Timezone || detectUserTimezone()
+          const tz = val.Timezone || detectUserTimezone()
+          this.cronExpression = val.Interval ? cronUtcToTimezone(val.Interval, tz) : '0 * * * *'
+          this.timezone = tz
         } else {
           this.formData = {
             ThemeTitle: '',

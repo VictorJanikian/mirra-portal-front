@@ -175,7 +175,7 @@
                         {{ scheduling.Status === 0 ? 'Active' : 'Inactive' }}
                       </span>
                       <span v-if="scheduling.Interval" class="scheduling-row__interval">
-                        {{ scheduling.Interval }}
+                        {{ displayInterval(scheduling) }}
                       </span>
                       <svg class="scheduling-row__arrow" width="14" height="14" viewBox="0 0 14 14" fill="none">
                         <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -245,7 +245,7 @@
                     {{ formatName(item.configUrl) }}
                   </span>
                   <span v-if="item.scheduling.Interval" class="scheduling-card__tag scheduling-card__tag--cron">
-                    {{ item.scheduling.Interval }}
+                    {{ displayInterval(item.scheduling) }}
                   </span>
                   <span
                     class="scheduling-card__tag"
@@ -324,6 +324,7 @@ import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import schedulingService from '@/services/schedulingService'
+import { cronUtcToTimezone } from '@/utils/cronTimezone'
 import type { Configuration, Scheduling } from '@/types'
 
 interface SchedulingItem {
@@ -405,6 +406,12 @@ export default defineComponent({
     }
   },
   methods: {
+    displayInterval(scheduling: Scheduling): string {
+      if (!scheduling?.Interval) return ''
+      return scheduling.Timezone
+        ? cronUtcToTimezone(scheduling.Interval, scheduling.Timezone)
+        : scheduling.Interval
+    },
     platformLabel(platformId: number): string {
       const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
       return map[platformId] || 'Platform'
