@@ -27,9 +27,17 @@
         :error="errors.password"
       />
 
+      <BaseSelect
+        v-model="country"
+        label="Country"
+        :options="countryOptions"
+        placeholder="Select your country"
+        :error="errors.country"
+      />
+
       <div v-if="serverError" class="auth-error">{{ serverError }}</div>
 
-      <BaseButton type="submit" :loading="loading" block>
+      <BaseButton type="submit" :loading="loading" block class="btn--form">
         Sign Up
       </BaseButton>
     </form>
@@ -44,38 +52,49 @@
 import { defineComponent } from 'vue'
 import AuthCard from '@/components/auth/AuthCard.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import { useAuth } from '@/composables/useAuth'
 import { isValidEmail, isValidPassword } from '@/utils/validators'
+import { COUNTRIES } from '@/constants/countries'
+import type { SelectOption } from '@/types'
 
 interface RegisterErrors {
   name: string
   email: string
   password: string
+  country: string
 }
 
 export default defineComponent({
   name: 'RegisterView',
-  components: { AuthCard, BaseInput, BaseButton },
+  components: { AuthCard, BaseInput, BaseSelect, BaseButton },
   data() {
     return {
       name: '',
       email: '',
       password: '',
+      country: '',
       loading: false,
       serverError: '',
-      errors: { name: '', email: '', password: '' } as RegisterErrors
+      errors: { name: '', email: '', password: '', country: '' } as RegisterErrors
+    }
+  },
+  computed: {
+    countryOptions(): SelectOption[] {
+      return COUNTRIES
     }
   },
   methods: {
     validate(): boolean {
-      this.errors = { name: '', email: '', password: '' }
+      this.errors = { name: '', email: '', password: '', country: '' }
       if (!this.name) this.errors.name = 'Please enter your name'
       if (!this.email) this.errors.email = 'Please enter your email'
       else if (!isValidEmail(this.email)) this.errors.email = 'Invalid email'
       if (!this.password) this.errors.password = 'Please enter a password'
       else if (!isValidPassword(this.password)) this.errors.password = 'Password must be at least 6 characters'
-      return !this.errors.name && !this.errors.email && !this.errors.password
+      if (!this.country) this.errors.country = 'Please select your country'
+      return !this.errors.name && !this.errors.email && !this.errors.password && !this.errors.country
     },
     async handleRegister(): Promise<void> {
       if (!this.validate()) return
@@ -83,7 +102,7 @@ export default defineComponent({
       this.serverError = ''
       try {
         const { register } = useAuth()
-        await register(this.name, this.email, this.password)
+        await register(this.name, this.email, this.password, this.country)
       } catch (e: unknown) {
         const err = e as { response?: { data?: { Message?: string } | string } }
         this.serverError = (err.response?.data as { Message?: string })?.Message || err.response?.data as string || 'Failed to create account. Please try again.'

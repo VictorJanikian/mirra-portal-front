@@ -109,6 +109,10 @@
   width: 100%;
 }
 
+.btn--form{
+  margin-top: 1em;
+}
+
 /* === Cards === */
 .card {
   background: var(--color-white);

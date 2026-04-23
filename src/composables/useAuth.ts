@@ -30,8 +30,8 @@ export function useAuth() {
     router.push(redirect || { name: 'Home' })
   }
 
-  async function register(name: string, email: string, password: string): Promise<void> {
-    await authService.register(name, email, password)
+  async function register(name: string, email: string, password: string, country: string): Promise<void> {
+    await authService.register(name, email, password, country)
     const redirect = router.currentRoute.value.query.redirect as string | undefined
     const query: Record<string, string> = { email }
     if (redirect) query.redirect = redirect
