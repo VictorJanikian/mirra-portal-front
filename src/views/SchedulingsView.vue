@@ -51,8 +51,8 @@
             <span class="scheduling-card__tag scheduling-card__tag--config">
               {{ formatUrl(item.configUrl) }}
             </span>
-            <span v-if="item.scheduling.Interval" class="scheduling-card__tag scheduling-card__tag--cron">
-              {{ displayInterval(item.scheduling) }}
+            <span v-if="item.scheduling.ConvertedInterval" class="scheduling-card__tag scheduling-card__tag--cron">
+              {{ item.scheduling.ConvertedInterval }}
             </span>
           </div>
         </div>
@@ -68,7 +68,6 @@
 import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
-import { cronUtcToTimezone } from '@/utils/cronTimezone'
 import type { Configuration, Scheduling } from '@/types'
 
 interface SchedulingItem {
@@ -108,12 +107,6 @@ export default defineComponent({
     }
   },
   methods: {
-    displayInterval(scheduling: Scheduling): string {
-      if (!scheduling?.Interval) return ''
-      return scheduling.Timezone
-        ? cronUtcToTimezone(scheduling.Interval, scheduling.Timezone)
-        : scheduling.Interval
-    },
     platformLabel(platformId: number): string {
       const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
       return map[platformId] || 'Platform'
