@@ -12,7 +12,7 @@ export function useSubscription() {
   const canCreateConfig = computed(() => remainingConfigurations.value > 0)
 
   const sortedPlans = computed(() =>
-    [...plans.value].sort((a, b) => a.Price - b.Price)
+    [...plans.value].sort((a, b) => a.DefaultPrice - b.DefaultPrice)
   )
 
   const currentPlan = computed(() =>
@@ -21,7 +21,7 @@ export function useSubscription() {
 
   const highestPlan = computed(() => {
     if (plans.value.length === 0) return null
-    return [...plans.value].sort((a, b) => b.Price - a.Price)[0]
+    return [...plans.value].sort((a, b) => b.DefaultPrice - a.DefaultPrice)[0]
   })
 
   const isOnHighestPlan = computed(() =>

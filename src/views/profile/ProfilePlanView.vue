@@ -25,7 +25,7 @@
         <!-- Header -->
         <div class="plan-card__header">
           <div class="plan-card__icon">
-            <SvgIcon :name="plan.Price === 0 ? 'clock' : 'star'" :size="32" />
+            <SvgIcon :name="plan.DefaultPrice === 0 ? 'clock' : 'star'" :size="32" />
           </div>
           <h3 class="plan-card__name">{{ plan.Name }}</h3>
         </div>
@@ -33,13 +33,13 @@
         <!-- Price -->
         <div class="plan-card__price-section">
           <div class="plan-card__price">
-            <template v-if="plan.Price === 0">
+            <template v-if="plan.DefaultPrice === 0">
               <span class="plan-card__price-value">Free</span>
             </template>
             <template v-else>
               <span class="plan-card__price-currency">$</span>
-              <span class="plan-card__price-value">{{ formatPriceInteger(plan.Price) }}</span>
-              <span class="plan-card__price-cents">,{{ formatPriceCents(plan.Price) }}</span>
+              <span class="plan-card__price-value">{{ formatPriceInteger(plan.DefaultPrice) }}</span>
+              <span class="plan-card__price-cents">,{{ formatPriceCents(plan.DefaultPrice) }}</span>
               <span class="plan-card__price-period">/month</span>
             </template>
           </div>
@@ -61,7 +61,7 @@
         </ul>
 
         <!-- Payment flags (paid plans only) -->
-        <div v-if="plan.Price > 0" class="plan-card__flags">
+        <div v-if="plan.DefaultPrice > 0" class="plan-card__flags">
           <span class="plan-card__flags-label">Payment methods accepted:</span>
           <div class="plan-card__flags-row">
             <img class="plan-card__flag" :src="flagVisa" alt="Visa">
@@ -75,7 +75,7 @@
         <button
           v-if="!isCurrentPlan(plan.Id)"
           class="btn btn--block plan-card__btn"
-          :class="plan.Price > 0 ? 'btn--primary' : 'btn--secondary'"
+          :class="plan.DefaultPrice > 0 ? 'btn--primary' : 'btn--secondary'"
           @click="handlePlanAction(plan)"
         >
           {{ isOnFreePlan ? 'Get Started' : 'Update plan' }}

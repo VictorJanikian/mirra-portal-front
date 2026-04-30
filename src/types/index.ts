@@ -84,7 +84,7 @@ export interface SubscriptionPlan {
   Name: string
   MaximumPosts: number
   MaximumConfigurations: number
-  Price: number
+  DefaultPrice: number
   PaymentLink: string | null
 }
 
