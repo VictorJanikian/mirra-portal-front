@@ -34,7 +34,7 @@
       label="Password"
       type="password"
       placeholder="Access password"
-      tooltip="Enter the password of the user you created in WordPress with the 'Author' role. This is not your admin panel password."
+      tooltip="Create an application password for the user with the Author role (Users -> User -> Add Application Password). This is not the user password."
       :error="errors.Password"
     />
 
