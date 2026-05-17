@@ -7,8 +7,10 @@ export default {
     return api.post('/api/account/login', { Email: email, Password: password })
   },
 
-  register(name: string, email: string, password: string, country: string): Promise<AxiosResponse<void>> {
-    return api.post('/api/account/register', { Name: name, Email: email, Password: password, Country: country })
+  register(name: string, email: string, password: string, country: string, referralCode?: string): Promise<AxiosResponse<void>> {
+    const payload: Record<string, string> = { Name: name, Email: email, Password: password, Country: country }
+    if (referralCode) payload.ReferralCode = referralCode
+    return api.post('/api/account/register', payload)
   },
 
   activate(email: string, code: string): Promise<AxiosResponse<AuthResponse>> {

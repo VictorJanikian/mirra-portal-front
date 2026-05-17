@@ -102,7 +102,8 @@ export default defineComponent({
       this.serverError = ''
       try {
         const { register } = useAuth()
-        await register(this.name, this.email, this.password, this.country)
+        const referralCode = this.$route.query.referralCode as string | undefined
+        await register(this.name, this.email, this.password, this.country, referralCode)
       } catch (e: unknown) {
         const err = e as { response?: { data?: { Message?: string } | string } }
         this.serverError = (err.response?.data as { Message?: string })?.Message || err.response?.data as string || 'Failed to create account. Please try again.'
