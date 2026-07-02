@@ -45,6 +45,7 @@ export interface Scheduling {
 export interface SchedulingPayload {
   Interval: string
   Timezone: string
+  ContentTypeId?: number
   Parameters: SchedulingParameters
 }
 

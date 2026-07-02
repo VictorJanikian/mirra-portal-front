@@ -51,6 +51,9 @@ import { useConfigurations } from '@/composables/useConfigurations'
 import { useToast } from '@/composables/useToast'
 import type { Scheduling, SchedulingPayload } from '@/types'
 
+const WORDPRESS_PLATFORM_ID = 1
+const WORDPRESS_CONTENT_TYPE_ID = 1
+
 export default defineComponent({
   name: 'SchedulingFormView',
   components: { SchedulingList, SchedulingForm, ConfirmModal },
@@ -80,6 +83,11 @@ export default defineComponent({
       const { configurations } = useConfigurations()
       const config = configurations.value.find(c => c.Id === Number(this.configId))
       return (config?.RemainingRunsPerWeek ?? 1) > 0
+    },
+    isWordpressPlatform(): boolean {
+      const { configurations } = useConfigurations()
+      const config = configurations.value.find(c => c.Id === Number(this.configId))
+      return config?.PlatformId === WORDPRESS_PLATFORM_ID
     }
   },
   watch: {
@@ -148,6 +156,10 @@ export default defineComponent({
           Interval: (cronExpression as string) || '0 * * * *',
           Timezone: (timezone as string) || '',
           Parameters: parameters as unknown as SchedulingPayload['Parameters']
+        }
+
+        if (this.isWordpressPlatform) {
+          payload.ContentTypeId = WORDPRESS_CONTENT_TYPE_ID
         }
 
         if (this.currentSchedulingId) {
