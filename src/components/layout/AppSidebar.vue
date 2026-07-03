@@ -53,11 +53,36 @@
                     </router-link>
 
                     <router-link
+                      v-if="config.RemainingRunsPerWeek > 0"
                       :to="`/configurations/${config.Id}/schedulings/new`"
                       class="sidebar__add-scheduling"
                     >
                       + New Schedule
                     </router-link>
+                    <div
+                      v-else
+                      class="sidebar__add-scheduling-wrapper"
+                      @mouseenter="showSchedulingTooltip"
+                      @mouseleave="hideSchedulingTooltip"
+                    >
+                      <span class="sidebar__add-scheduling sidebar__add-scheduling--disabled">
+                        <SvgIcon name="lock" :size="12" class="sidebar__lock-icon" />
+                        New Schedule
+                      </span>
+                      <teleport to="body">
+                        <div
+                          v-if="schedulingTooltipVisible"
+                          class="sidebar__limit-tooltip"
+                          :style="schedulingTooltipStyle"
+                          @mouseenter="keepSchedulingTooltip"
+                          @mouseleave="hideSchedulingTooltip"
+                        >
+                          You have reached the maximum number of weekly posts for this connection.
+                          <router-link :to="{ name: 'ProfilePlan' }" class="sidebar__limit-tooltip-link">Click here</router-link>
+                          to upgrade your plan.
+                        </div>
+                      </teleport>
+                    </div>
                   </div>
                 </transition>
               </div>
@@ -194,7 +219,10 @@ export default defineComponent({
       profileHover: false,
       configTooltipVisible: false,
       configTooltipStyle: {} as Record<string, string>,
-      configTooltipTimer: null as ReturnType<typeof setTimeout> | null
+      configTooltipTimer: null as ReturnType<typeof setTimeout> | null,
+      schedulingTooltipVisible: false,
+      schedulingTooltipStyle: {} as Record<string, string>,
+      schedulingTooltipTimer: null as ReturnType<typeof setTimeout> | null
     }
   },
   watch: {},
@@ -249,6 +277,33 @@ export default defineComponent({
     hideConfigTooltip(): void {
       this.configTooltipTimer = setTimeout(() => {
         this.configTooltipVisible = false
+      }, 100)
+    },
+    showSchedulingTooltip(event: MouseEvent): void {
+      if (this.schedulingTooltipTimer) {
+        clearTimeout(this.schedulingTooltipTimer)
+        this.schedulingTooltipTimer = null
+      }
+      const wrapper = event.currentTarget as HTMLElement
+      const rect = wrapper.getBoundingClientRect()
+      this.schedulingTooltipStyle = {
+        position: 'fixed',
+        left: `${rect.right + 4}px`,
+        top: `${rect.top + rect.height / 2}px`,
+        transform: 'translateY(-50%)'
+      }
+      this.schedulingTooltipVisible = true
+    },
+    keepSchedulingTooltip(): void {
+      if (this.schedulingTooltipTimer) {
+        clearTimeout(this.schedulingTooltipTimer)
+        this.schedulingTooltipTimer = null
+      }
+      this.schedulingTooltipVisible = true
+    },
+    hideSchedulingTooltip(): void {
+      this.schedulingTooltipTimer = setTimeout(() => {
+        this.schedulingTooltipVisible = false
       }, 100)
     }
   },
@@ -463,6 +518,19 @@ export default defineComponent({
 .sidebar__add-scheduling:hover {
   background: var(--color-primary-light);
   text-decoration: none;
+}
+
+.sidebar__add-scheduling-wrapper {
+  position: relative;
+}
+
+.sidebar__add-scheduling--disabled {
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+}
+
+.sidebar__add-scheduling--disabled:hover {
+  background: none;
 }
 
 .sidebar__add-config {
