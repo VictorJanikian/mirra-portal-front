@@ -22,16 +22,6 @@
           <span>{{ wildcardLabel }}</span>
         </label>
 
-        <!-- Unselected option (for days/weekdays) -->
-        <label v-if="showUnselected" class="multiselect__option">
-          <input
-            type="checkbox"
-            :checked="isUnselected"
-            @change="selectUnselected"
-          />
-          <span>Not Selected</span>
-        </label>
-
         <div class="multiselect__divider" />
 
         <!-- Regular options -->
@@ -63,8 +53,7 @@ export default defineComponent({
   props: {
     modelValue: { type: Array as PropType<string[]>, default: () => ['*'] },
     options: { type: Array as PropType<SelectOption[]>, required: true },
-    wildcardLabel: { type: String, default: 'All' },
-    showUnselected: { type: Boolean, default: false }
+    wildcardLabel: { type: String, default: 'All' }
   },
   emits: ['update:modelValue'],
   data() {
@@ -74,12 +63,8 @@ export default defineComponent({
     isWildcard(): boolean {
       return this.modelValue.includes('*')
     },
-    isUnselected(): boolean {
-      return this.modelValue.includes('?')
-    },
     displayValue(): string {
       if (this.isWildcard) return this.wildcardLabel
-      if (this.isUnselected) return 'Not Selected'
       if (this.modelValue.length === 0) return this.wildcardLabel
       const labels = this.modelValue.map((v: string) => {
         const opt = this.options.find((o: SelectOption) => String(o.value) === String(v))
@@ -99,9 +84,6 @@ export default defineComponent({
     selectWildcard(): void {
       this.$emit('update:modelValue', ['*'])
     },
-    selectUnselected(): void {
-      this.$emit('update:modelValue', ['?'])
-    },
     isSelected(value: string): boolean {
       return this.modelValue.includes(String(value))
     },
@@ -109,7 +91,7 @@ export default defineComponent({
       const strValue = String(value)
       let newValues: string[]
 
-      if (this.isWildcard || this.isUnselected) {
+      if (this.isWildcard) {
         newValues = [strValue]
       } else if (this.isSelected(strValue)) {
         newValues = this.modelValue.filter((v: string) => v !== strValue)

@@ -8,5 +8,6 @@ export function isValidPassword(password: string): boolean {
 
 export function isValidCron(expression: string): boolean {
   if (!expression) return false
-  return /^([*?0-9,/-]+ ){4}[*?0-9,/-]+$/.test(expression.trim())
+  // '?' is intentionally excluded: the backend cron engine rejects it
+  return /^([*0-9,/-]+ ){4}[*0-9,/-]+$/.test(expression.trim())
 }
