@@ -103,13 +103,12 @@ export function cronToHuman(expr: string): string {
 }
 
 export function parseCronField(field: string): string[] {
-  if (field === '*') return ['*']
-  if (field === '?') return ['?']
+  // The backend cron engine does not accept '?', so it is normalized to '*'
+  if (field === '*' || field === '?') return ['*']
   return field.split(',')
 }
 
 export function buildCronField(values: string[] | null | undefined): string {
-  if (!values || values.length === 0 || values.includes('*')) return '*'
-  if (values.includes('?')) return '?'
+  if (!values || values.length === 0 || values.includes('*') || values.includes('?')) return '*'
   return values.join(',')
 }

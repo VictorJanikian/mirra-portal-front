@@ -34,7 +34,6 @@
           :model-value="fields.daysOfMonth"
           :options="dayOptions"
           wildcard-label="All"
-          :show-unselected="true"
           @update:model-value="updateField('daysOfMonth', $event)"
         />
         <CronFieldSelect
@@ -49,7 +48,6 @@
           :model-value="fields.weekdays"
           :options="weekdayOptions"
           wildcard-label="All"
-          :show-unselected="true"
           @update:model-value="updateField('weekdays', $event)"
         />
       </div>
@@ -66,7 +64,7 @@
         @input="onRawInput"
       />
       <small class="cron-builder__help">
-        Use 5 fields: minute / hour / day / month / weekday (use ? for "not selected")
+        Use 5 fields: minute / hour / day / month / weekday (use * for "all")
       </small>
     </div>
 

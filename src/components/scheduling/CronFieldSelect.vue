@@ -6,7 +6,6 @@
       :model-value="modelValue"
       :options="options"
       :wildcard-label="wildcardLabel"
-      :show-unselected="showUnselected"
       @update:model-value="$emit('update:modelValue', $event)"
     />
     <select
@@ -40,7 +39,6 @@ export default defineComponent({
     options: { type: Array as PropType<SelectOption[]>, required: true },
     wildcardLabel: { type: String, default: 'All' },
     multiple: { type: Boolean, default: true },
-    showUnselected: { type: Boolean, default: false },
     hideWildcard: { type: Boolean, default: false }
   },
   emits: ['update:modelValue'],
