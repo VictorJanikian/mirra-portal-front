@@ -276,23 +276,29 @@
           label="Connection Name"
           placeholder="My website"
         />
-        <BaseInput
-          v-model="editForm.Url"
-          label="Website URL"
-          placeholder="https://mysite.com"
-        />
-        <BaseInput
-          v-model="editForm.Username"
-          label="Username"
-          placeholder="Username"
-          tooltip="This is not your WordPress admin login. Go to your WordPress admin panel → Users → Add New User, create a user with at least the 'Author' role, and enter that username here."
-        />
-        <BaseInput
-          v-model="editForm.Password"
-          label="Password"
-          type="password"
-          placeholder="Leave blank to keep current"
-        />
+        <template v-if="editPlatformId !== PLATFORM_INSTAGRAM">
+          <BaseInput
+            v-model="editForm.Url"
+            label="Website URL"
+            placeholder="https://mysite.com"
+          />
+          <BaseInput
+            v-model="editForm.Username"
+            label="Username"
+            placeholder="Username"
+            tooltip="This is not your WordPress admin login. Go to your WordPress admin panel → Users → Add New User, create a user with at least the 'Author' role, and enter that username here."
+          />
+          <BaseInput
+            v-model="editForm.Password"
+            label="Password"
+            type="password"
+            placeholder="Leave blank to keep current"
+          />
+        </template>
+        <p v-else class="config-edit-form__hint">
+          This profile is connected through Instagram. To change the authorized
+          account, delete this connection and connect again.
+        </p>
         <div class="config-edit-form__actions">
           <BaseButton type="submit" :loading="editLoading">Save</BaseButton>
           <BaseButton variant="secondary" @click="showEditModal = false">Cancel</BaseButton>
@@ -324,6 +330,7 @@ import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import schedulingService from '@/services/schedulingService'
+import { PLATFORM_INSTAGRAM, PLATFORM_LABELS } from '@/types'
 import type { Configuration, Scheduling } from '@/types'
 
 interface SchedulingItem {
@@ -346,9 +353,11 @@ export default defineComponent({
       hasSuspendedNopayment: false,
       hasSuspendedDowngrade: false,
       // Edit connection
+      PLATFORM_INSTAGRAM,
       showEditModal: false,
       editLoading: false,
       editConfigId: null as number | null,
+      editPlatformId: null as number | null,
       editForm: { PlatformName: '', Url: '', Username: '', Password: '' },
       // Delete connection
       showDeleteConfigModal: false,
@@ -406,8 +415,7 @@ export default defineComponent({
   },
   methods: {
     platformLabel(platformId: number): string {
-      const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
-      return map[platformId] || 'Platform'
+      return PLATFORM_LABELS[platformId] || 'Platform'
     },
     formatName(name: string): string {
       if (!name) return 'No name'
@@ -429,6 +437,7 @@ export default defineComponent({
     },
     openEditConfig(config: Configuration): void {
       this.editConfigId = config.Id
+      this.editPlatformId = config.PlatformId
       this.editForm = {
         PlatformName: config.PlatformName,
         Url: config.Url,
@@ -874,6 +883,12 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+}
+
+.config-edit-form__hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  line-height: 1.5;
 }
 
 .config-edit-form__actions {

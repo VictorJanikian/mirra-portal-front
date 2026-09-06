@@ -68,6 +68,7 @@
 import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
+import { PLATFORM_LABELS } from '@/types'
 import type { Configuration, Scheduling } from '@/types'
 
 interface SchedulingItem {
@@ -108,8 +109,7 @@ export default defineComponent({
   },
   methods: {
     platformLabel(platformId: number): string {
-      const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
-      return map[platformId] || 'Platform'
+      return PLATFORM_LABELS[platformId] || 'Platform'
     },
     formatUrl(url: string): string {
       if (!url) return 'No URL'

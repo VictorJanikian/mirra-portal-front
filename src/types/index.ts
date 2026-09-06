@@ -78,6 +78,23 @@ export interface ConfigurationUpdatePayload {
   Password: string
 }
 
+/** Body of GET /api/configuration/instagram/start (200). */
+export interface InstagramStartResponse {
+  redirectUrl: string
+  /** Same value, in case the API serializes with the PascalCase used elsewhere. */
+  RedirectUrl?: string
+}
+
+// ─── Platforms ─────────────────────────────────────────────
+
+export const PLATFORM_WORDPRESS = 1
+export const PLATFORM_INSTAGRAM = 2
+
+export const PLATFORM_LABELS: Record<number, string> = {
+  [PLATFORM_WORDPRESS]: 'WordPress',
+  [PLATFORM_INSTAGRAM]: 'Instagram'
+}
+
 // ─── Subscription ─────────────────────────────────────────
 
 export interface SubscriptionPlan {

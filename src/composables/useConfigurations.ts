@@ -43,5 +43,27 @@ export function useConfigurations() {
     return configurations.value.filter(c => c.PlatformId === platformId)
   }
 
-  return { configurations, loading, error, fetchAll, create, update, remove, getByPlatform }
+  /**
+   * Starts the Instagram connection flow: asks the backend for the authorization
+   * URL and sends the browser to it. Instagram sends the user back to the portal
+   * home once the profile is authorized.
+   */
+  async function startInstagramConnection(): Promise<void> {
+    const { data } = await configurationService.startInstagram()
+    const url = data?.redirectUrl || data?.RedirectUrl
+    if (!url) throw new Error('Failed to start the Instagram connection')
+    window.location.href = url
+  }
+
+  return {
+    configurations,
+    loading,
+    error,
+    fetchAll,
+    create,
+    update,
+    remove,
+    getByPlatform,
+    startInstagramConnection
+  }
 }

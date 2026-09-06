@@ -122,15 +122,112 @@
         <!-- Instagram -->
         <div class="sidebar__platform">
           <button
-            class="sidebar__platform-btn sidebar__platform-btn--disabled"
+            class="sidebar__platform-btn"
+            :class="{ active: expandedPlatform === 2 }"
             @click="togglePlatform(2)"
           >
             <svg class="sidebar__platform-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
             </svg>
             Instagram
-            <span class="sidebar__coming-soon">Coming soon</span>
+            <svg class="sidebar__expand-icon" :class="{ rotated: expandedPlatform === 2 }" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4 2L8 6L4 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
           </button>
+
+          <transition name="expand">
+            <div v-if="expandedPlatform === 2" class="sidebar__configs">
+              <div
+                v-for="config in instagramConfigs"
+                :key="config.Id"
+                class="sidebar__config"
+              >
+                <button
+                  class="sidebar__config-btn"
+                  :class="{ active: expandedConfig === config.Id }"
+                  @click="toggleConfig(config.Id)"
+                >
+                  <span class="sidebar__config-url">{{ formatName(config.PlatformName) }}</span>
+                  <span class="sidebar__config-badge">{{ (config.Schedulings || []).length }}</span>
+                </button>
+
+                <transition name="expand">
+                  <div v-if="expandedConfig === config.Id" class="sidebar__schedulings">
+                    <router-link
+                      v-for="scheduling in (config.Schedulings || [])"
+                      :key="scheduling.Id"
+                      :to="`/configurations/${config.Id}/schedulings/${scheduling.Id}`"
+                      class="sidebar__scheduling-link"
+                      active-class="active"
+                    >
+                      {{ scheduling.Parameters?.ThemeTitle || `Schedule #${scheduling.Id}` }}
+                    </router-link>
+
+                    <router-link
+                      v-if="config.RemainingRunsPerWeek > 0"
+                      :to="`/configurations/${config.Id}/schedulings/new`"
+                      class="sidebar__add-scheduling"
+                    >
+                      + New Schedule
+                    </router-link>
+                    <div
+                      v-else
+                      class="sidebar__add-scheduling-wrapper"
+                      @mouseenter="showSchedulingTooltip"
+                      @mouseleave="hideSchedulingTooltip"
+                    >
+                      <span class="sidebar__add-scheduling sidebar__add-scheduling--disabled">
+                        <SvgIcon name="lock" :size="12" class="sidebar__lock-icon" />
+                        New Schedule
+                      </span>
+                      <teleport to="body">
+                        <div
+                          v-if="schedulingTooltipVisible"
+                          class="sidebar__limit-tooltip"
+                          :style="schedulingTooltipStyle"
+                          @mouseenter="keepSchedulingTooltip"
+                          @mouseleave="hideSchedulingTooltip"
+                        >
+                          You have reached the maximum number of weekly posts for this connection.
+                          <router-link :to="{ name: 'ProfilePlan' }" class="sidebar__limit-tooltip-link">Click here</router-link>
+                          to upgrade your plan.
+                        </div>
+                      </teleport>
+                    </div>
+                  </div>
+                </transition>
+              </div>
+
+              <div
+                class="sidebar__add-config-wrapper"
+                @mouseenter="showConfigTooltip"
+                @mouseleave="hideConfigTooltip"
+              >
+                <button
+                  class="sidebar__add-config"
+                  :class="{ 'sidebar__add-config--disabled': !canCreateConfig }"
+                  :disabled="!canCreateConfig"
+                  @click="canCreateConfig && $emit('new-configuration', 2)"
+                >
+                  <SvgIcon v-if="!canCreateConfig" name="lock" :size="12" class="sidebar__lock-icon" />
+                  {{ canCreateConfig ? '+ Connect profile' : 'Connect profile' }}
+                </button>
+                <teleport to="body">
+                  <div
+                    v-if="!canCreateConfig && configTooltipVisible"
+                    class="sidebar__limit-tooltip"
+                    :style="configTooltipStyle"
+                    @mouseenter="keepConfigTooltip"
+                    @mouseleave="hideConfigTooltip"
+                  >
+                    You have reached the maximum number of connections available on your plan.
+                    <router-link :to="{ name: 'ProfilePlan' }" class="sidebar__limit-tooltip-link">Click here</router-link>
+                    to upgrade your plan.
+                  </div>
+                </teleport>
+              </div>
+            </div>
+          </transition>
         </div>
       </div>
     </nav>
@@ -203,6 +300,7 @@ import { useAuth } from '@/composables/useAuth'
 import { useConfigurations } from '@/composables/useConfigurations'
 import { useSubscription } from '@/composables/useSubscription'
 import SvgIcon from '@/components/ui/SvgIcon.vue'
+import { PLATFORM_WORDPRESS, PLATFORM_INSTAGRAM } from '@/types'
 import type { Configuration } from '@/types'
 
 export default defineComponent({
@@ -229,7 +327,11 @@ export default defineComponent({
   computed: {
     wordpressConfigs(): Configuration[] {
       const { configurations } = useConfigurations()
-      return configurations.value.filter((c: Configuration) => c.PlatformId === 1)
+      return configurations.value.filter((c: Configuration) => c.PlatformId === PLATFORM_WORDPRESS)
+    },
+    instagramConfigs(): Configuration[] {
+      const { configurations } = useConfigurations()
+      return configurations.value.filter((c: Configuration) => c.PlatformId === PLATFORM_INSTAGRAM)
     },
     canCreateConfig(): boolean {
       const { canCreateConfig } = useSubscription()
@@ -398,11 +500,6 @@ export default defineComponent({
   color: var(--color-primary-dark);
 }
 
-.sidebar__platform-btn--disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
 .sidebar__platform-icon {
   flex-shrink: 0;
 }
@@ -415,15 +512,6 @@ export default defineComponent({
 
 .sidebar__expand-icon.rotated {
   transform: rotate(90deg);
-}
-
-.sidebar__coming-soon {
-  margin-left: auto;
-  font-size: var(--font-size-xs);
-  color: var(--color-gray-400);
-  background: var(--color-gray-100);
-  padding: 2px 8px;
-  border-radius: 10px;
 }
 
 .sidebar__configs {

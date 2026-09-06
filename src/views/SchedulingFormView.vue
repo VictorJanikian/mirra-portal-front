@@ -49,9 +49,8 @@ import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import { useSchedulings } from '@/composables/useSchedulings'
 import { useConfigurations } from '@/composables/useConfigurations'
 import { useToast } from '@/composables/useToast'
+import { PLATFORM_WORDPRESS } from '@/types'
 import type { Scheduling, SchedulingPayload } from '@/types'
-
-const WORDPRESS_PLATFORM_ID = 1
 const WORDPRESS_CONTENT_TYPE_ID = 1
 
 export default defineComponent({
@@ -87,7 +86,7 @@ export default defineComponent({
     isWordpressPlatform(): boolean {
       const { configurations } = useConfigurations()
       const config = configurations.value.find(c => c.Id === Number(this.configId))
-      return config?.PlatformId === WORDPRESS_PLATFORM_ID
+      return config?.PlatformId === PLATFORM_WORDPRESS
     }
   },
   watch: {
