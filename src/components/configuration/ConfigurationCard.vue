@@ -19,6 +19,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
 import PlatformIcon from './PlatformIcon.vue'
+import { PLATFORM_LABELS } from '@/types'
 import type { Configuration } from '@/types'
 
 export default defineComponent({
@@ -30,8 +31,7 @@ export default defineComponent({
   emits: ['select'],
   computed: {
     platformLabel(): string {
-      const map: Record<number, string> = { 1: 'WordPress', 2: 'Instagram' }
-      return map[this.configuration.PlatformId] || 'Platform'
+      return PLATFORM_LABELS[this.configuration.PlatformId] || 'Platform'
     },
     schedulingCount(): number {
       return (this.configuration.Schedulings || []).length

@@ -1,12 +1,5 @@
 <template>
   <form @submit.prevent="handleSubmit" class="config-form">
-    <BaseInput
-      v-model="form.PlatformName"
-      label="Connection Name"
-      placeholder="My website"
-      :error="errors.PlatformName"
-    />
-
     <BaseSelect
       v-model="form.PlatformId"
       label="Platform"
@@ -14,38 +7,68 @@
       :error="errors.PlatformId"
     />
 
-    <BaseInput
-      v-model="form.Url"
-      label="Website URL"
-      placeholder="https://mysite.com"
-      :error="errors.Url"
-    />
+    <!-- Instagram: connected through the official authorization flow -->
+    <template v-if="isInstagram">
+      <div class="config-form__connect">
+        <PlatformIcon :platform-id="PLATFORM_INSTAGRAM" class="config-form__connect-icon" />
+        <p class="config-form__connect-text">
+          You will be redirected to Instagram to authorize Mirra AI.
+          After confirming, your profile is connected automatically.
+        </p>
+      </div>
 
-    <BaseInput
-      v-model="form.Username"
-      label="Username"
-      placeholder="Username"
-      tooltip="This is not your WordPress admin login. Go to your WordPress admin panel → Users → Add New User, create a user with at least the 'Author' role, and enter that username here."
-      :error="errors.Username"
-    />
+      <div class="config-form__actions">
+        <BaseButton :loading="loading" @click="handleInstagramConnect">
+          Connect Instagram
+        </BaseButton>
+        <BaseButton variant="secondary" @click="$emit('cancel')">
+          Cancel
+        </BaseButton>
+      </div>
+    </template>
 
-    <BaseInput
-      v-model="form.Password"
-      label="Password"
-      type="password"
-      placeholder="Access password"
-      tooltip="Create an application password for the user with the Author role (Users -> User -> Add Application Password). This is not the user password."
-      :error="errors.Password"
-    />
+    <!-- WordPress: manual credentials -->
+    <template v-else>
+      <BaseInput
+        v-model="form.PlatformName"
+        label="Connection Name"
+        placeholder="My website"
+        :error="errors.PlatformName"
+      />
 
-    <div class="config-form__actions">
-      <BaseButton type="submit" :loading="loading">
-        Save
-      </BaseButton>
-      <BaseButton variant="secondary" @click="$emit('cancel')">
-        Cancel
-      </BaseButton>
-    </div>
+      <BaseInput
+        v-model="form.Url"
+        label="Website URL"
+        placeholder="https://mysite.com"
+        :error="errors.Url"
+      />
+
+      <BaseInput
+        v-model="form.Username"
+        label="Username"
+        placeholder="Username"
+        tooltip="This is not your WordPress admin login. Go to your WordPress admin panel → Users → Add New User, create a user with at least the 'Author' role, and enter that username here."
+        :error="errors.Username"
+      />
+
+      <BaseInput
+        v-model="form.Password"
+        label="Password"
+        type="password"
+        placeholder="Access password"
+        tooltip="Create an application password for the user with the Author role (Users -> User -> Add Application Password). This is not the user password."
+        :error="errors.Password"
+      />
+
+      <div class="config-form__actions">
+        <BaseButton type="submit" :loading="loading">
+          Save
+        </BaseButton>
+        <BaseButton variant="secondary" @click="$emit('cancel')">
+          Cancel
+        </BaseButton>
+      </div>
+    </template>
   </form>
 </template>
 
@@ -54,8 +77,10 @@ import { defineComponent } from 'vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import { useToast } from '@/composables/useToast'
+import { PLATFORM_WORDPRESS, PLATFORM_INSTAGRAM } from '@/types'
 import type { SelectOption } from '@/types'
 
 interface ConfigFormData {
@@ -68,16 +93,17 @@ interface ConfigFormData {
 
 export default defineComponent({
   name: 'ConfigurationForm',
-  components: { BaseInput, BaseSelect, BaseButton },
+  components: { BaseInput, BaseSelect, BaseButton, PlatformIcon },
   props: {
     platformId: { type: Number, default: 0 }
   },
   emits: ['saved', 'cancel'],
   data() {
     return {
+      PLATFORM_INSTAGRAM,
       form: {
         PlatformName: '',
-        PlatformId: String(this.platformId),
+        PlatformId: String(this.platformId || PLATFORM_WORDPRESS),
         Url: '',
         Username: '',
         Password: ''
@@ -85,8 +111,20 @@ export default defineComponent({
       errors: {} as Record<string, string>,
       loading: false,
       platformOptions: [
-        { value: '1', label: 'WordPress' }
+        { value: String(PLATFORM_WORDPRESS), label: 'WordPress' },
+        { value: String(PLATFORM_INSTAGRAM), label: 'Instagram' }
       ] as SelectOption[]
+    }
+  },
+  computed: {
+    isInstagram(): boolean {
+      return Number(this.form.PlatformId) === PLATFORM_INSTAGRAM
+    }
+  },
+  watch: {
+    platformId(value: number): void {
+      this.form.PlatformId = String(value || PLATFORM_WORDPRESS)
+      this.errors = {}
     }
   },
   methods: {
@@ -99,6 +137,10 @@ export default defineComponent({
       return Object.keys(this.errors).length === 0
     },
     async handleSubmit(): Promise<void> {
+      if (this.isInstagram) {
+        await this.handleInstagramConnect()
+        return
+      }
       if (!this.validate()) return
       this.loading = true
       try {
@@ -114,6 +156,20 @@ export default defineComponent({
         const { error } = useToast()
         error(err.response?.data?.Message || 'Failed to create connection')
       } finally {
+        this.loading = false
+      }
+    },
+    async handleInstagramConnect(): Promise<void> {
+      this.loading = true
+      try {
+        const { startInstagramConnection } = useConfigurations()
+        await startInstagramConnection()
+        // The browser is now heading to Instagram, so the loading state is kept
+        // on purpose until the page unloads.
+      } catch (e: unknown) {
+        const err = e as { response?: { data?: { Message?: string } }; message?: string }
+        const { error } = useToast()
+        error(err.response?.data?.Message || err.message || 'Failed to start the Instagram connection')
         this.loading = false
       }
     }
@@ -132,5 +188,26 @@ export default defineComponent({
   display: flex;
   gap: var(--spacing-sm);
   margin-top: var(--spacing-md);
+}
+
+.config-form__connect {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--color-gray-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.config-form__connect-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.config-form__connect-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  line-height: 1.5;
 }
 </style>
