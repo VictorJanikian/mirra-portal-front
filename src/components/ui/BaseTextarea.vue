@@ -11,6 +11,7 @@
       :placeholder="placeholder"
       :disabled="disabled"
       :rows="rows"
+      :maxlength="maxlength"
       class="form-field__textarea"
       :class="{ 'form-field__textarea--error': error }"
     />
@@ -34,7 +35,8 @@ export default defineComponent({
     tooltip: { type: String, default: '' },
     error: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
-    rows: { type: [String, Number], default: 4 }
+    rows: { type: [String, Number], default: 4 },
+    maxlength: { type: [String, Number], default: null }
   },
   emits: ['update:modelValue'],
   setup() {

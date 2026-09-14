@@ -18,20 +18,47 @@ export interface AuthResponse extends User {
 
 // ─── Scheduling ────────────────────────────────────────────
 
+/** Shared by every platform. */
 export interface SchedulingParameters {
   ThemeTitle: string
   Description: string
-  SearchIntent: string
-  Keywords: string
   TargetAudience: string
   Style: string
   Goal: string
   CTA: string
-  ApproximatedSize: string
-  AdditionalInfo: string
-  SEOAdditionalInformation: string
   Language: string
+  AdditionalInfo: string
+  /** WordPress only. */
+  SearchIntent?: string
+  /** WordPress only. */
+  Keywords?: string
+  /** WordPress only. */
+  ApproximatedSize?: string
+  /** WordPress only. */
+  SEOAdditionalInformation?: string
+  /** Instagram only. */
+  VisualHookInstructions?: string
+  /** Instagram only. */
+  CaptionInstructions?: string
+  /** Instagram only. Comma-separated colors. */
+  ColorPalette?: string
+  /** Instagram only. */
+  VisualLayout?: string
+  /** Instagram only. */
+  TextOnImage?: string
+  /** Instagram only. 0 = short, 1 = medium, 2 = large. */
+  CaptionSizeId?: number | null
+  /** Instagram only. */
+  HashtagsStrategy?: string
+  /** Instagram only. */
+  AvoidTopics?: string
+  /** Instagram only. */
+  ContentTone?: string
 }
+
+export const CAPTION_SIZE_SHORT = 0
+export const CAPTION_SIZE_MEDIUM = 1
+export const CAPTION_SIZE_LARGE = 2
 
 export interface Scheduling {
   Id: number
@@ -39,14 +66,24 @@ export interface Scheduling {
   ConvertedInterval: string
   Timezone: string
   Status: number
+  ContentTypeId: number
   Parameters: SchedulingParameters
 }
 
 export interface SchedulingPayload {
   Interval: string
   Timezone: string
-  ContentTypeId?: number
+  ContentTypeId: number
   Parameters: SchedulingParameters
+}
+
+/** What SchedulingForm emits on submit. */
+export interface SchedulingFormSubmit {
+  interval: string
+  timezone: string
+  parameters: SchedulingParameters
+  /** Only set once a platform lets the user pick it; otherwise the view defaults it. */
+  contentTypeId?: number
 }
 
 // ─── Configuration ─────────────────────────────────────────
@@ -93,6 +130,17 @@ export const PLATFORM_INSTAGRAM = 2
 export const PLATFORM_LABELS: Record<number, string> = {
   [PLATFORM_WORDPRESS]: 'WordPress',
   [PLATFORM_INSTAGRAM]: 'Instagram'
+}
+
+// ─── Content types ─────────────────────────────────────────
+
+export const CONTENT_TYPE_WORDPRESS = 1
+export const CONTENT_TYPE_INSTAGRAM_SINGLE_POST = 2
+
+/** Used when the platform does not let the user pick a content type. */
+export const DEFAULT_CONTENT_TYPE_BY_PLATFORM: Record<number, number> = {
+  [PLATFORM_WORDPRESS]: CONTENT_TYPE_WORDPRESS,
+  [PLATFORM_INSTAGRAM]: CONTENT_TYPE_INSTAGRAM_SINGLE_POST
 }
 
 // ─── Subscription ─────────────────────────────────────────
