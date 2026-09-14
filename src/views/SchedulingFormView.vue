@@ -19,6 +19,7 @@
         v-if="showForm"
         :key="currentSchedulingId ?? 'new'"
         :scheduling="currentScheduling"
+        :platform-id="platformId"
         :loading="saving"
         @submit="onSubmit"
         @delete="onDeleteScheduling"
@@ -49,9 +50,12 @@ import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import { useSchedulings } from '@/composables/useSchedulings'
 import { useConfigurations } from '@/composables/useConfigurations'
 import { useToast } from '@/composables/useToast'
-import { PLATFORM_WORDPRESS } from '@/types'
-import type { Scheduling, SchedulingPayload } from '@/types'
-const WORDPRESS_CONTENT_TYPE_ID = 1
+import {
+  PLATFORM_WORDPRESS,
+  CONTENT_TYPE_WORDPRESS,
+  DEFAULT_CONTENT_TYPE_BY_PLATFORM
+} from '@/types'
+import type { Scheduling, SchedulingPayload, SchedulingFormSubmit } from '@/types'
 
 export default defineComponent({
   name: 'SchedulingFormView',
@@ -83,10 +87,13 @@ export default defineComponent({
       const config = configurations.value.find(c => c.Id === Number(this.configId))
       return (config?.RemainingRunsPerWeek ?? 1) > 0
     },
-    isWordpressPlatform(): boolean {
+    platformId(): number {
       const { configurations } = useConfigurations()
       const config = configurations.value.find(c => c.Id === Number(this.configId))
-      return config?.PlatformId === PLATFORM_WORDPRESS
+      return config?.PlatformId ?? PLATFORM_WORDPRESS
+    },
+    defaultContentTypeId(): number {
+      return DEFAULT_CONTENT_TYPE_BY_PLATFORM[this.platformId] ?? CONTENT_TYPE_WORDPRESS
     }
   },
   watch: {
@@ -146,19 +153,15 @@ export default defineComponent({
       })
     },
 
-    async onSubmit(formData: Record<string, unknown>): Promise<void> {
+    async onSubmit(form: SchedulingFormSubmit): Promise<void> {
       this.saving = true
       const { success, error } = useToast()
       try {
-        const { cronExpression, timezone, ...parameters } = formData
         const payload: SchedulingPayload = {
-          Interval: (cronExpression as string) || '0 * * * *',
-          Timezone: (timezone as string) || '',
-          Parameters: parameters as unknown as SchedulingPayload['Parameters']
-        }
-
-        if (this.isWordpressPlatform) {
-          payload.ContentTypeId = WORDPRESS_CONTENT_TYPE_ID
+          Interval: form.interval || '0 * * * *',
+          Timezone: form.timezone || '',
+          ContentTypeId: form.contentTypeId ?? this.defaultContentTypeId,
+          Parameters: form.parameters
         }
 
         if (this.currentSchedulingId) {
