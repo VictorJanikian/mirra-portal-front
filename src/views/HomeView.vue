@@ -124,7 +124,7 @@
                   <span class="config-item__platform-label">{{ platformLabel(config.PlatformId) }}</span>
                 </div>
                 <div class="config-item__details">
-                  <span class="config-item__url">{{ formatName(config.PlatformName) }}</span>
+                  <span class="config-item__url">{{ connectionName(config) }}</span>
                   <span class="config-item__user">{{ config.Username }}</span>
                 </div>
                 <span class="config-item__badge">
@@ -242,7 +242,7 @@
                     {{ platformLabel(item.platformId) }}
                   </span>
                   <span class="scheduling-card__tag scheduling-card__tag--config">
-                    {{ formatName(item.configUrl) }}
+                    {{ schedulingConfigLabel(item) }}
                   </span>
                   <span v-if="item.scheduling.ConvertedInterval" class="scheduling-card__tag scheduling-card__tag--cron">
                     {{ item.scheduling.ConvertedInterval }}
@@ -331,11 +331,13 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import schedulingService from '@/services/schedulingService'
 import { PLATFORM_INSTAGRAM, PLATFORM_LABELS } from '@/types'
+import { formatConfigurationName } from '@/utils/formatters'
 import type { Configuration, Scheduling } from '@/types'
 
 interface SchedulingItem {
   configId: number
   configUrl: string
+  configName: string
   platformId: number
   scheduling: Scheduling
 }
@@ -405,6 +407,7 @@ export default defineComponent({
           result.push({
             configId: config.Id,
             configUrl: config.Url,
+            configName: formatConfigurationName(config),
             platformId: config.PlatformId,
             scheduling
           })
@@ -419,7 +422,14 @@ export default defineComponent({
     },
     formatName(name: string): string {
       if (!name) return 'No name'
-      return name;
+      return name
+    },
+    connectionName(config: Configuration): string {
+      return this.formatName(formatConfigurationName(config))
+    },
+    schedulingConfigLabel(item: SchedulingItem): string {
+      if (item.platformId === PLATFORM_INSTAGRAM) return item.configName
+      return this.formatName(item.configUrl)
     },
     isExpanded(id: number): boolean {
       return this.expandedConfigs.includes(id)
