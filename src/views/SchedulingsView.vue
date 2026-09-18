@@ -49,7 +49,7 @@
               {{ platformLabel(item.platformId) }}
             </span>
             <span class="scheduling-card__tag scheduling-card__tag--config">
-              {{ formatUrl(item.configUrl) }}
+              {{ configLabel(item) }}
             </span>
             <span v-if="item.scheduling.ConvertedInterval" class="scheduling-card__tag scheduling-card__tag--cron">
               {{ item.scheduling.ConvertedInterval }}
@@ -68,12 +68,14 @@
 import { defineComponent } from 'vue'
 import { useConfigurations } from '@/composables/useConfigurations'
 import PlatformIcon from '@/components/configuration/PlatformIcon.vue'
-import { PLATFORM_LABELS } from '@/types'
+import { PLATFORM_INSTAGRAM, PLATFORM_LABELS } from '@/types'
+import { formatConfigurationName } from '@/utils/formatters'
 import type { Configuration, Scheduling } from '@/types'
 
 interface SchedulingItem {
   configId: number
   configUrl: string
+  configName: string
   platformId: number
   scheduling: Scheduling
 }
@@ -98,6 +100,7 @@ export default defineComponent({
             result.push({
               configId: config.Id,
               configUrl: config.Url,
+              configName: formatConfigurationName(config),
               platformId: config.PlatformId,
               scheduling
             })
@@ -110,6 +113,10 @@ export default defineComponent({
   methods: {
     platformLabel(platformId: number): string {
       return PLATFORM_LABELS[platformId] || 'Platform'
+    },
+    configLabel(item: SchedulingItem): string {
+      if (item.platformId === PLATFORM_INSTAGRAM) return item.configName
+      return this.formatUrl(item.configUrl)
     },
     formatUrl(url: string): string {
       if (!url) return 'No URL'

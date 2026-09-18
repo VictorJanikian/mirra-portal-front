@@ -36,7 +36,7 @@
                   :class="{ active: expandedConfig === config.Id }"
                   @click="toggleConfig(config.Id)"
                 >
-                  <span class="sidebar__config-url">{{ formatName(config.PlatformName) }}</span>
+                  <span class="sidebar__config-url">{{ formatName(connectionName(config)) }}</span>
                   <span class="sidebar__config-badge">{{ (config.Schedulings || []).length }}</span>
                 </button>
 
@@ -147,7 +147,7 @@
                   :class="{ active: expandedConfig === config.Id }"
                   @click="toggleConfig(config.Id)"
                 >
-                  <span class="sidebar__config-url">{{ formatName(config.PlatformName) }}</span>
+                  <span class="sidebar__config-url">{{ formatName(connectionName(config)) }}</span>
                   <span class="sidebar__config-badge">{{ (config.Schedulings || []).length }}</span>
                 </button>
 
@@ -301,6 +301,7 @@ import { useConfigurations } from '@/composables/useConfigurations'
 import { useSubscription } from '@/composables/useSubscription'
 import SvgIcon from '@/components/ui/SvgIcon.vue'
 import { PLATFORM_WORDPRESS, PLATFORM_INSTAGRAM } from '@/types'
+import { formatConfigurationName } from '@/utils/formatters'
 import type { Configuration } from '@/types'
 
 export default defineComponent({
@@ -344,6 +345,9 @@ export default defineComponent({
     },
     toggleConfig(id: number): void {
       this.expandedConfig = this.expandedConfig === id ? null : id
+    },
+    connectionName(config: Configuration): string {
+      return formatConfigurationName(config)
     },
     formatName(name: string): string {
       if (!name) return 'No name'

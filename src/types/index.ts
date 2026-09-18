@@ -95,6 +95,8 @@ export interface Configuration {
   Url: string
   Username: string
   Password: string
+  /** Handle of the linked Instagram account. Only present on Instagram configurations. */
+  InstagramUsername?: string
   Schedulings: Scheduling[]
   RemainingRunsPerWeek: number
 }
