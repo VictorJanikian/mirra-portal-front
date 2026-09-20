@@ -226,6 +226,20 @@
         v-model:timezone="timezone"
       />
 
+      <template v-if="!isWordpress">
+        <BaseToggle
+          v-model="instagramAIGeneratedLabel"
+          label="Include AI generated label"
+          tooltip="Turn this on only if you want the content labeled as &quot;created by Artificial Intelligence.&quot; - Instagram will then show the &quot;AI info&quot; badge. Note that it is not required under Meta's current policy for images - the type of content Mirra creates."
+        />
+
+        <BaseToggle
+          v-model="instagramPartnershipLabel"
+          label="Include paid partnership label"
+          tooltip="Turn this on when the content has a commercial purpose — such as advertising, selling or promoting a product in exchange for a benefit. Instagram will show the &quot;Paid partnership&quot; badge."
+        />
+      </template>
+
       <div class="scheduling-form__actions">
         <BaseButton type="submit" :loading="loading">
           Save
@@ -241,6 +255,7 @@ import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseTextarea from '@/components/ui/BaseTextarea.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
 import SuggestionTextarea from '@/components/ui/SuggestionTextarea.vue'
+import BaseToggle from '@/components/ui/BaseToggle.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import CronBuilder from './CronBuilder.vue'
 import SvgIcon from '@/components/ui/SvgIcon.vue'
@@ -394,7 +409,7 @@ function buildFormData(
 
 export default defineComponent({
   name: 'SchedulingForm',
-  components: { BaseInput, BaseTextarea, BaseSelect, SuggestionTextarea, BaseButton, CronBuilder, SvgIcon },
+  components: { BaseInput, BaseTextarea, BaseSelect, SuggestionTextarea, BaseToggle, BaseButton, CronBuilder, SvgIcon },
   props: {
     scheduling: { type: Object as PropType<Scheduling | null>, default: null },
     platformId: { type: Number, default: PLATFORM_WORDPRESS },
@@ -412,7 +427,9 @@ export default defineComponent({
       CAPTION_SIZE_OPTIONS,
       formData: buildFormData(this.scheduling?.Parameters, this.platformId === PLATFORM_WORDPRESS),
       cronExpression: initialCron,
-      timezone: initialTimezone
+      timezone: initialTimezone,
+      instagramAIGeneratedLabel: this.scheduling?.InstagramAIGeneratedLabel ?? false,
+      instagramPartnershipLabel: this.scheduling?.InstagramPartnershipLabel ?? false
     }
   },
   computed: {
@@ -450,6 +467,11 @@ export default defineComponent({
         timezone: this.timezone,
         parameters: this.formData
       }
+      // WordPress has no such labels, so they stay out of the payload entirely.
+      if (!this.isWordpress) {
+        submit.instagramAIGeneratedLabel = this.instagramAIGeneratedLabel
+        submit.instagramPartnershipLabel = this.instagramPartnershipLabel
+      }
       this.$emit('submit', submit)
     }
   },
@@ -459,6 +481,8 @@ export default defineComponent({
         this.formData = buildFormData(val?.Parameters, this.isWordpress)
         this.cronExpression = val?.ConvertedInterval || '0 * * * *'
         this.timezone = val?.Timezone || detectUserTimezone()
+        this.instagramAIGeneratedLabel = val?.InstagramAIGeneratedLabel ?? false
+        this.instagramPartnershipLabel = val?.InstagramPartnershipLabel ?? false
       },
       deep: true
     },

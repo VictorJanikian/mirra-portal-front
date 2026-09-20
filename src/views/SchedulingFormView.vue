@@ -164,6 +164,14 @@ export default defineComponent({
           Parameters: form.parameters
         }
 
+        // The form only emits these on Instagram; WordPress payloads stay untouched.
+        if (form.instagramAIGeneratedLabel !== undefined) {
+          payload.InstagramAIGeneratedLabel = form.instagramAIGeneratedLabel
+        }
+        if (form.instagramPartnershipLabel !== undefined) {
+          payload.InstagramPartnershipLabel = form.instagramPartnershipLabel
+        }
+
         if (this.currentSchedulingId) {
           const updated = await this.api.update(this.currentSchedulingId, payload)
           this.currentScheduling = { ...updated, Status: 0 }
