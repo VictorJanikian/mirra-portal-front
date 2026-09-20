@@ -67,6 +67,10 @@ export interface Scheduling {
   Timezone: string
   Status: number
   ContentTypeId: number
+  /** Instagram only. Flags the post as AI generated. */
+  InstagramAIGeneratedLabel?: boolean
+  /** Instagram only. Flags the post as a paid partnership. */
+  InstagramPartnershipLabel?: boolean
   Parameters: SchedulingParameters
 }
 
@@ -74,6 +78,10 @@ export interface SchedulingPayload {
   Interval: string
   Timezone: string
   ContentTypeId: number
+  /** Instagram only; left out of the payload on every other platform. */
+  InstagramAIGeneratedLabel?: boolean
+  /** Instagram only; left out of the payload on every other platform. */
+  InstagramPartnershipLabel?: boolean
   Parameters: SchedulingParameters
 }
 
@@ -84,6 +92,10 @@ export interface SchedulingFormSubmit {
   parameters: SchedulingParameters
   /** Only set once a platform lets the user pick it; otherwise the view defaults it. */
   contentTypeId?: number
+  /** Instagram only; undefined on every other platform. */
+  instagramAIGeneratedLabel?: boolean
+  /** Instagram only; undefined on every other platform. */
+  instagramPartnershipLabel?: boolean
 }
 
 // ─── Configuration ─────────────────────────────────────────
