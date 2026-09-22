@@ -226,19 +226,12 @@
         v-model:timezone="timezone"
       />
 
-      <template v-if="!isWordpress">
-        <BaseToggle
-          v-model="instagramAIGeneratedLabel"
-          label="Include AI generated label"
-          tooltip="Turn this on only if you want the content labeled as &quot;created by Artificial Intelligence.&quot; - Instagram will then show the &quot;AI info&quot; badge. Note that it is not required under Meta's current policy for images - the type of content Mirra creates."
-        />
-
-        <BaseToggle
-          v-model="instagramPartnershipLabel"
-          label="Include paid partnership label"
-          tooltip="Turn this on when the content has a commercial purpose — such as advertising, selling or promoting a product in exchange for a benefit. Instagram will show the &quot;Paid partnership&quot; badge."
-        />
-      </template>
+      <BaseToggle
+        v-if="!isWordpress"
+        v-model="instagramAIGeneratedLabel"
+        label="Include AI generated label"
+        tooltip="Turn this on only if you want the content labeled as &quot;created by Artificial Intelligence.&quot; - Instagram will then show the &quot;AI info&quot; badge. Note that it is not required under Meta's current policy for images - the type of content Mirra creates."
+      />
 
       <div class="scheduling-form__actions">
         <BaseButton type="submit" :loading="loading">
@@ -428,8 +421,7 @@ export default defineComponent({
       formData: buildFormData(this.scheduling?.Parameters, this.platformId === PLATFORM_WORDPRESS),
       cronExpression: initialCron,
       timezone: initialTimezone,
-      instagramAIGeneratedLabel: this.scheduling?.InstagramAIGeneratedLabel ?? false,
-      instagramPartnershipLabel: this.scheduling?.InstagramPartnershipLabel ?? false
+      instagramAIGeneratedLabel: this.scheduling?.InstagramAIGeneratedLabel ?? false
     }
   },
   computed: {
@@ -467,10 +459,9 @@ export default defineComponent({
         timezone: this.timezone,
         parameters: this.formData
       }
-      // WordPress has no such labels, so they stay out of the payload entirely.
+      // WordPress has no such label, so it stays out of the payload entirely.
       if (!this.isWordpress) {
         submit.instagramAIGeneratedLabel = this.instagramAIGeneratedLabel
-        submit.instagramPartnershipLabel = this.instagramPartnershipLabel
       }
       this.$emit('submit', submit)
     }
@@ -482,7 +473,6 @@ export default defineComponent({
         this.cronExpression = val?.ConvertedInterval || '0 * * * *'
         this.timezone = val?.Timezone || detectUserTimezone()
         this.instagramAIGeneratedLabel = val?.InstagramAIGeneratedLabel ?? false
-        this.instagramPartnershipLabel = val?.InstagramPartnershipLabel ?? false
       },
       deep: true
     },

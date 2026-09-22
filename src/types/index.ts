@@ -69,8 +69,6 @@ export interface Scheduling {
   ContentTypeId: number
   /** Instagram only. Flags the post as AI generated. */
   InstagramAIGeneratedLabel?: boolean
-  /** Instagram only. Flags the post as a paid partnership. */
-  InstagramPartnershipLabel?: boolean
   Parameters: SchedulingParameters
 }
 
@@ -80,8 +78,6 @@ export interface SchedulingPayload {
   ContentTypeId: number
   /** Instagram only; left out of the payload on every other platform. */
   InstagramAIGeneratedLabel?: boolean
-  /** Instagram only; left out of the payload on every other platform. */
-  InstagramPartnershipLabel?: boolean
   Parameters: SchedulingParameters
 }
 
@@ -94,8 +90,6 @@ export interface SchedulingFormSubmit {
   contentTypeId?: number
   /** Instagram only; undefined on every other platform. */
   instagramAIGeneratedLabel?: boolean
-  /** Instagram only; undefined on every other platform. */
-  instagramPartnershipLabel?: boolean
 }
 
 // ─── Configuration ─────────────────────────────────────────
